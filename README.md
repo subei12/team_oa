@@ -3,7 +3,7 @@
 
 使用地址：https://oa.jsls9.top
 
-本仓库为后端仓库，
+本仓库为后端仓库，前端仓库为[team_oa_web](https://github.com/subei12/team_oa_web)
 
 ### 技术栈
 springboot、shiro、mybatis等
