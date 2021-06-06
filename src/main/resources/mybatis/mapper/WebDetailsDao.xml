@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.jsls9.oajsfx.dao.WebDetailsDao">
+  <resultMap id="BaseResultMap" type="top.jsls9.oajsfx.model.WebDetails">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="web_path" jdbcType="VARCHAR" property="webPath" />
+    <result column="web_name" jdbcType="VARCHAR" property="webName" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="create_user_id" jdbcType="VARCHAR" property="createUserId" />
+    <result column="web_remarks" jdbcType="VARCHAR" property="webRemarks" />
+    <result column="start_date" jdbcType="TIMESTAMP" property="startDate" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="update_user_id" jdbcType="VARCHAR" property="updateUserId" />
+    <result column="web_sort_id" jdbcType="VARCHAR" property="webSortId" />
+    <result column="admin_remark" jdbcType="VARCHAR" property="adminRemark" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, web_path, web_name, email, create_user_id, web_remarks, start_date, update_date, 
+    update_user_id, web_sort_id, admin_remark, `state`
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from web_details
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from web_details
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="top.jsls9.oajsfx.model.WebDetails" useGeneratedKeys="true">
+    insert into web_details (id,web_path, web_name, email,
+      create_user_id, web_remarks, start_date, 
+      update_date, update_user_id, web_sort_id, 
+      admin_remark, `state`)
+    values (uuid(),#{webPath,jdbcType=VARCHAR}, #{webName,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},
+      #{createUserId,jdbcType=VARCHAR}, #{webRemarks,jdbcType=VARCHAR}, sysdate(),
+      #{updateDate,jdbcType=TIMESTAMP}, #{updateUserId,jdbcType=VARCHAR}, #{webSortId,jdbcType=VARCHAR}, 
+      #{adminRemark,jdbcType=VARCHAR}, 1)
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="top.jsls9.oajsfx.model.WebDetails" useGeneratedKeys="true">
+    insert into web_details
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="webPath != null">
+        web_path,
+      </if>
+      <if test="webName != null">
+        web_name,
+      </if>
+      <if test="email != null">
+        email,
+      </if>
+      <if test="createUserId != null">
+        create_user_id,
+      </if>
+      <if test="webRemarks != null">
+        web_remarks,
+      </if>
+      <if test="startDate != null">
+        start_date,
+      </if>
+      <if test="updateDate != null">
+        update_date,
+      </if>
+      <if test="updateUserId != null">
+        update_user_id,
+      </if>
+      <if test="webSortId != null">
+        web_sort_id,
+      </if>
+      <if test="adminRemark != null">
+        admin_remark,
+      </if>
+      <if test="state != null">
+        `state`,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="webPath != null">
+        #{webPath,jdbcType=VARCHAR},
+      </if>
+      <if test="webName != null">
+        #{webName,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="createUserId != null">
+        #{createUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="webRemarks != null">
+        #{webRemarks,jdbcType=VARCHAR},
+      </if>
+      <if test="startDate != null">
+        #{startDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null">
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUserId != null">
+        #{updateUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="webSortId != null">
+        #{webSortId,jdbcType=VARCHAR},
+      </if>
+      <if test="adminRemark != null">
+        #{adminRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="top.jsls9.oajsfx.model.WebDetails">
+    update web_details
+    <set>
+      <if test="webPath != null">
+        web_path = #{webPath,jdbcType=VARCHAR},
+      </if>
+      <if test="webName != null">
+        web_name = #{webName,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="createUserId != null">
+        create_user_id = #{createUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="webRemarks != null">
+        web_remarks = #{webRemarks,jdbcType=VARCHAR},
+      </if>
+      <if test="startDate != null">
+        start_date = #{startDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null">
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUserId != null">
+        update_user_id = #{updateUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="webSortId != null">
+        web_sort_id = #{webSortId,jdbcType=VARCHAR},
+      </if>
+      <if test="adminRemark != null">
+        admin_remark = #{adminRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        `state` = #{state,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="top.jsls9.oajsfx.model.WebDetails">
+    update web_details
+    set web_path = #{webPath,jdbcType=VARCHAR},
+      web_name = #{webName,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      create_user_id = #{createUserId,jdbcType=VARCHAR},
+      web_remarks = #{webRemarks,jdbcType=VARCHAR},
+      start_date = #{startDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      update_user_id = #{updateUserId,jdbcType=VARCHAR},
+      web_sort_id = #{webSortId,jdbcType=VARCHAR},
+      admin_remark = #{adminRemark,jdbcType=VARCHAR},
+      `state` = #{state,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
+
+    <select id="getWebDetails" resultMap="BaseResultMap">
+        select id, web_path, web_name, email, create_user_id, web_remarks, start_date, update_date, update_user_id, web_sort_id, admin_remark, state from web_details where state!=3 order by start_date desc
+  </select>
+    <select id="getWebDetailsByWebPath" resultMap="BaseResultMap">
+      select id, web_path, web_name, create_user_id, start_date, update_date, update_user_id, web_sort_id, admin_remark, state
+      from web_details where state=0
+      <if test="webPath!=null and webPath!=''">
+        and web_path like  concat("%",#{webPath,jdbcType=VARCHAR},"%")
+      </if>
+       order by start_date desc
+    </select>
+
+    <update id="updateById" parameterType="top.jsls9.oajsfx.model.WebDetails">
+        update web_details set
+        admin_remark = #{adminRemark,jdbcType=VARCHAR},
+        `state` = #{state,jdbcType=INTEGER},
+        update_date = sysdate(),
+        update_user_id = #{updateUserId,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

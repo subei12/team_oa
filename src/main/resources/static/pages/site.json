@@ -1,0 +1,541 @@
+{
+  "status": 0,
+  "msg": "",
+  "data": {
+    "pages": [
+      {
+        "label": "Home",
+        "url": "/",
+        "redirect": "/webDetails/crud"
+      },
+      {
+        "label": "网站处理区",
+        "children": [
+          {
+            "label": "黑名单列表",
+            "url": "/webDetails/crud",
+            "rewrite": "/webDetails/crud/list",
+            "icon": "fa fa-cube",
+            "schema": {
+              "type": "page",
+              "title": "列表",
+              "remark": null,
+              "name": "page-demo",
+              "toolbar": [
+                {
+                  "type": "button",
+                  "actionType": "link",
+                  "link": "/webDetails/crud/new",
+                  "label": "新增黑名单",
+                  "primary": true
+                }
+              ],
+              "body": [
+                {
+                  "type": "crud",
+                  "name": "sample",
+                  "api": "/webDetail",
+                  "messages": {
+                    "fetchSuccess": "请求成功，使用请求的msg覆盖消息"
+                  },
+                  "filter": {
+                    "title": "",
+                    "mode": "inline",
+                    "wrapWithPanel": false,
+                    "submitText": "",
+                    "controls": [
+                      {
+                        "type": "text",
+                        "name": "keywords",
+                        "placeholder": "通过关键字搜索",
+                        "addOn": {
+                          "label": "搜索",
+                          "type": "submit",
+                          "className": "btn-success"
+                        },
+                        "clearable": true
+                      }
+                    ],
+                    "className": "m-b-sm"
+                  },
+                  "columns": [
+                    {
+                      "name": "webPath",
+                      "label": "域名",
+                      "sortable": true
+                    },
+                    {
+                      "name": "webName",
+                      "label": "网站名",
+                      "sortable": true
+                    },
+                    {
+                      "name": "webSortName",
+                      "label": "分类",
+                      "sortable": true
+                    },
+                    {
+                      "name": "state",
+                      "label": "状态",
+                      "type": "mapping",
+                      "map": {
+                        "未审核": "<span class='label label-warning'>未审核</span>",
+                        "已通过": "<span class='label label-success'>已通过</span>",
+                        "未通过": "<span class='label label-danger'>未通过</span>"
+                      }
+                    },
+                    {
+                      "name": "startDate",
+                      "label": "举报日期",
+                      "sortable": true
+                    },
+                    {
+                      "name": "updateDate",
+                      "label": "审核日期",
+                      "sortable": true
+                    },
+                    {
+                      "name": "updateUserId",
+                      "label": "审核人员",
+                      "sortable": true
+                    },
+                    {
+                      "type": "operation",
+                      "label": "操作",
+                      "width": "",
+                      "buttons": [
+                        {
+                          "type": "button-group",
+                          "buttons": [
+                            {
+                              "type": "button",
+                              "label": "查看",
+                              "level": "primary",
+                              "actionType": "link",
+                              "link": "/webDetails/crud/${id}"
+                            },
+                            {
+                              "type": "button",
+                              "label": "审核",
+                              "level": "info",
+                              "actionType": "link",
+                              "link": "/webDetails/crud/${id}/edit"
+                            }
+                          ]
+                        }
+                      ],
+                      "placeholder": "-",
+                      "fixed": "right"
+                    }
+                  ],
+                  "affixHeader": true,
+                  "columnsTogglable": "auto",
+                  "placeholder": "暂无数据",
+                  "tableClassName": "table-db table-striped",
+                  "headerClassName": "crud-table-header",
+                  "footerClassName": "crud-table-footer",
+                  "toolbarClassName": "crud-table-toolbar",
+                  "combineNum": 0,
+                  "bodyClassName": "panel-default"
+                }
+              ]
+            },
+            "children": [
+              {
+                "label": "列表",
+                "url": "/webDetails/crud/list",
+                "icon": "fa fa-list",
+                "schemaApi": "get:/pages/webDetails/crud-list.json"
+              },
+              {
+                "label": "添加黑名单",
+                "url": "/webDetails/crud/new",
+                "icon": "fa fa-plus",
+                "schemaApi": "get:/pages/webDetails/crud-new.json"
+              },
+              {
+                "label": "查看",
+                "url": "/webDetails/crud/:id",
+                "schemaApi": "get:/pages/webDetails/crud-view.json"
+              },
+              {
+                "label": "修改",
+                "url": "/webDetails/crud/:id/edit",
+                "schemaApi": "get:/pages/webDetails/crud-edit.json"
+              }
+            ]
+          },
+          {
+            "label": "分类管理",
+            "schema": {
+              "type": "page",
+              "title": "列表",
+              "remark": null,
+              "name": "page-demo",
+              "toolbar": [
+                {
+                  "label": "新增分类",
+                  "type": "button",
+                  "actionType": "dialog",
+                  "level": "primary",
+                  "className": "m-b-sm",
+                  "reload": "webSort",
+                  "dialog": {
+                    "title": "新增分类",
+                    "body": {
+                      "type": "form",
+                      "api": "post:/webSort",
+                      "controls": [
+                        {
+                          "type": "text",
+                          "name": "name",
+                          "label": "分类名"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "body": [
+                {
+                  "type": "crud",
+                  "name": "webSort",
+                  "api": "/webSort",
+                  "messages": {
+                    "fetchSuccess": "请求成功，使用请求的msg覆盖消息"
+                  },
+                  "filter": {
+                    "title": "",
+                    "mode": "inline",
+                    "wrapWithPanel": false,
+                    "submitText": "",
+                    "controls": [
+                      {
+                        "type": "text",
+                        "name": "keywords",
+                        "placeholder": "通过关键字搜索",
+                        "addOn": {
+                          "label": "搜索",
+                          "type": "submit",
+                          "className": "btn-success"
+                        },
+                        "clearable": true
+                      }
+                    ],
+                    "className": "m-b-sm"
+                  },
+                  "bulkActions": [
+                    {
+                      "label": "批量删除",
+                      "type": "button",
+                      "level": "danger",
+                      "actionType": "ajax",
+                      "api": "delete:/webSort/$ids",
+                      "confirmText": "确定要批量删除?"
+                    }
+                  ],
+                  "columns": [
+                    {
+                      "name": "name",
+                      "label": "name",
+                      "sortable": true
+                    },
+                    {
+                      "name": "createDate",
+                      "label": "createDate",
+                      "sortable": true
+                    },
+                    {
+                      "name": "createUserId",
+                      "label": "创建人",
+                      "sortable": true
+                    },
+                    {
+                      "type": "operation",
+                      "label": "操作",
+                      "width": "",
+                      "buttons": [
+                        {
+                          "type": "button-group",
+                          "buttons": [
+                            {
+                              "label": "修改",
+                              "type": "button",
+                              "level": "primary",
+                              "actionType": "dialog",
+                              "reload": "webSort",
+                              "dialog": {
+                                "title": "修改分类名",
+                                "body": {
+                                  "type": "form",
+                                  "api": "put:webSort/$id",
+                                  "controls": [{
+                                    "type": "text",
+                                    "name": "name",
+                                    "label": "分类名字"
+                                  }]
+                                }
+                              }
+                            },
+                            {
+                              "type": "button",
+                              "label": "删除",
+                              "level": "danger",
+                              "actionType": "ajax",
+                              "confirmText": "您确认要删除?",
+                              "api": "delete:/webSort/$id"
+                            }
+                          ]
+                        }
+                      ],
+                      "placeholder": "-",
+                      "fixed": "right"
+                    }
+                  ],
+                  "affixHeader": true,
+                  "columnsTogglable": "auto",
+                  "placeholder": "暂无数据",
+                  "tableClassName": "table-db table-striped",
+                  "headerClassName": "crud-table-header",
+                  "footerClassName": "crud-table-footer",
+                  "toolbarClassName": "crud-table-toolbar",
+                  "combineNum": 0,
+                  "bodyClassName": "panel-default"
+                }
+              ]
+            }
+          },
+          {
+            "label": "新增",
+            "url": "/webSort/crud/:id/new",
+            "schemaApi": "get:/pages/webSort/crud-new.json"
+          }
+        ]
+      },
+      {
+        "label": "系统管理区",
+        "children": [
+          {
+            "label": "用户管理",
+            "url": "/crud",
+            "rewrite": "/crud/list",
+            "icon": "fa fa-cube",
+            "children": [
+              {
+                "label": "列表",
+                "url": "/crud/list",
+                "icon": "fa fa-list",
+                "schema": {
+                  "type": "page",
+                  "title": "列表",
+                  "remark": null,
+                  "name": "page-demo",
+                  "toolbar": [
+                    {
+                      "type": "button",
+                      "actionType": "link",
+                      "link": "/crud/new",
+                      "label": "新增",
+                      "primary": true
+                    }
+                  ],
+                  "body": [
+                    {
+                      "type": "crud",
+                      "name": "sample",
+                      "api": "/user",
+                      "messages": {
+                        "fetchSuccess": "请求成功，使用请求的msg覆盖消息"
+                      },
+                      "filter": {
+                        "title": "",
+                        "mode": "inline",
+                        "wrapWithPanel": false,
+                        "submitText": "",
+                        "controls": [
+                          {
+                            "type": "text",
+                            "name": "keywords",
+                            "placeholder": "通过关键字搜索",
+                            "addOn": {
+                              "label": "搜索",
+                              "type": "submit",
+                              "className": "btn-success"
+                            },
+                            "clearable": true
+                          }
+                        ],
+                        "className": "m-b-sm"
+                      },
+                      "bulkActions": [
+                        {
+                          "label": "批量修改",
+                          "type": "button",
+                          "actionType": "dialog",
+                          "level": "primary",
+                          "dialog": {
+                            "title": "批量编辑",
+                            "name": "sample-bulk-edit",
+                            "body": {
+                              "type": "form",
+                              "api": "/api/sample/bulkUpdate2",
+                              "controls": [
+                                {
+                                  "type": "text",
+                                  "name": "engine",
+                                  "label": "Engine"
+                                }
+                              ]
+                            }
+                          }
+                        },
+                        {
+                          "label": "批量删除",
+                          "type": "button",
+                          "level": "danger",
+                          "actionType": "ajax",
+                          "api": "delete:/user/$ids",
+                          "confirmText": "确定要批量删除?"
+                        }
+                      ],
+                      "columns": [
+                        {
+                          "name": "username",
+                          "label": "userName",
+                          "sortable": true
+                        },
+                        {
+                          "name": "createTime",
+                          "label": "createDate",
+                          "sortable": true
+                        },
+                        {
+                          "name": "roleNames",
+                          "label": "roleName(s)",
+                          "sortable": true
+                        },
+                        {
+                          "type": "operation",
+                          "label": "操作",
+                          "width": "",
+                          "buttons": [
+                            {
+                              "type": "button-group",
+                              "buttons": [
+                                {
+                                  "type": "button",
+                                  "label": "修改/授权",
+                                  "level": "primary",
+                                  "actionType": "dialog",
+                                  "dialog": {
+                                    "title": "在弹框中的表单",
+                                    "actions": [
+                                      {
+                                        "label": "取消",
+                                        "actionType": "close",
+                                        "type": "button"
+                                      },
+                                      {
+                                        "label": "确认",
+                                        "actionType": "confirm",
+                                        "type": "button",
+                                        "level": "primary"
+                                      }
+                                    ],
+                                    "body": {
+                                      "type": "form",
+                                      "api": "put:/user/$id",
+                                      "title": "常规模式",
+                                      "mode": "normal",
+                                      "controls": [
+                                        {
+                                          "type": "checkboxes",
+                                          "label": "选择角色",
+                                          "name": "roles",
+                                          "options": [
+                                            {
+                                              "label": "超级管理员",
+                                              "value": "superAdmin"
+                                            },
+                                            {
+                                              "label": "管理员",
+                                              "value": "admin"
+                                            },
+                                            {
+                                              "label": "开发者",
+                                              "value": "dev"
+                                            }
+                                          ],
+                                          "className": "",
+                                          "source": "/role",
+                                          "labelClassName": "",
+                                          "inputClassName": "",
+                                          "mode": "",
+                                          "joinValues": true
+                                        }
+                                      ]
+                                    }
+                                  }
+                                },
+                                {
+                                  "type": "button",
+                                  "label": "删除",
+                                  "level": "danger",
+                                  "actionType": "ajax",
+                                  "confirmText": "您确认要删除?",
+                                  "api": "delete:/user/$id"
+                                }
+                              ]
+                            }
+                          ],
+                          "placeholder": "-",
+                          "fixed": "right"
+                        }
+                      ],
+                      "affixHeader": true,
+                      "columnsTogglable": "auto",
+                      "placeholder": "暂无数据",
+                      "tableClassName": "table-db table-striped",
+                      "headerClassName": "crud-table-header",
+                      "footerClassName": "crud-table-footer",
+                      "toolbarClassName": "crud-table-toolbar",
+                      "combineNum": 0,
+                      "bodyClassName": "panel-default"
+                    }
+                  ]
+                }
+              },
+              {
+                "label": "新增",
+                "url": "/crud/new",
+                "icon": "fa fa-plus",
+                "schemaApi": "get:/pages/crud-new.json"
+              },
+              {
+                "label": "查看",
+                "url": "/crud/:id",
+                "schemaApi": "get:/pages/crud-view.json"
+              },
+              {
+                "label": "修改",
+                "url": "/crud/:id/edit",
+                "schemaApi": "get:/pages/crud-edit.json"
+              }
+            ]
+          },
+          {
+            "label": "外部链接",
+            "link": "http://baidu.gitee.io/amis"
+          },
+          {
+            "label": "部门管理",
+            "type": "button",
+            "actionType": "ajax",
+            "api": "https://3xsw4ap8wah59.cfc-execute.bj.baidubce.com/api/amis-mock/mock2/form/saveForm",
+            "redirect": "/login.html"
+          }
+        ]
+      }
+    ]
+  }
+}

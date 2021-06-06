@@ -1,0 +1,111 @@
+{
+  "type": "page",
+  "title": "新增",
+  "remark": null,
+  "toolbar": [
+    {
+      "type": "button",
+      "actionType": "link",
+      "link": "/webDetails/crud/list",
+      "label": "返回列表"
+    }
+  ],
+  "body": [
+    {
+      "title": "",
+      "type": "form",
+      "redirect": "/webDetails/crud/list",
+      "name": "sample-edit-form",
+      "api": "/webDetail",
+      "controls": [
+        {
+          "label": "网站域名",
+          "type": "text",
+          "name": "webPath",
+          "labelRemark": {
+            "icon": "fa fa-question-circle",
+            "trigger": [
+              "hover",
+              "focus"
+            ],
+            "className": "Remark--warning",
+            "title": "网站域名"
+          },
+          "description": "",
+          "required": true,
+          "validations": {},
+          "options": [],
+          "addOn": null,
+          "autoComplete": ""
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "text",
+          "label": "网站名称",
+          "name": "webName",
+          "required": true,
+          "remark": null,
+          "labelRemark": {
+            "icon": "fa fa-question-circle",
+            "trigger": [
+              "hover",
+              "focus"
+            ],
+            "className": "Remark--warning",
+            "title": "网站名称"
+          },
+          "validations": {}
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "email",
+          "label": "提交邮箱",
+          "name": "email",
+          "required": true,
+          "remark": null,
+          "labelRemark": {
+            "icon": "fa fa-question-circle",
+            "trigger": [
+              "hover",
+              "focus"
+            ],
+            "className": "Remark--warning",
+            "title": "提交邮箱"
+          },
+          "validations": {}
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "label": "选择分类",
+          "type": "select",
+          "labelClassName": "text-muted",
+          "name": "webSortId",
+          "inline": true,
+          "source": "get:/api/webSorts"
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "rich-text",
+          "name": "webRemarks",
+          "label": "举报原因/理由",
+          "reciever": "/api/upload/image",
+          "vendor": "tinymce",
+          "options": {
+            "menubar": true,
+            "height": 400,
+            "plugins": "advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking table emoticons template paste help",
+            "toolbar": "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media fullpage | forecolor backcolor emoticons | help"
+          }
+        }
+      ]
+    }
+  ]
+}

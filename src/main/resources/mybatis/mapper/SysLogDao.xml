@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.jsls9.oajsfx.dao.SysLogDao">
+    <insert id="save" parameterType="top.jsls9.oajsfx.model.SysLog" >
+        insert into t_syslog (username,operation,method,params,ip,create_time)
+        values (#{userName},#{operation},#{method},#{params},#{ip},#{createTime})
+    </insert>
+
+    <select id="getOne" resultType="top.jsls9.oajsfx.model.SysLog" >
+        select id,username,operation,method,params,ip,create_time
+        from t_syslog where id=#{id}
+    </select>
+
+    <select id="getList" resultType="top.jsls9.oajsfx.model.SysLog">
+        <if test="sysLog !=null and sysLog.userName!=null and sysLog.userName!=''">
+            <bind name="pattern_userName" value="'%'+sysLog.userName+'%'"/>
+        </if>
+        select id,username,operation,method,params,ip,create_time from t_syslog
+        <where>
+            <if test="sysLog !=null and sysLog.userName!=null and sysLog.userName!=''">
+                username like #{pattern_userName}
+            </if>
+        </where>
+        order by id ASC limit ${from},${pageSize}
+    </select>
+
+    <select id="count" resultType="int" parameterType="top.jsls9.oajsfx.model.SysLog">
+        <if test="userName!=null and userName!=''">
+            <bind name="pattern_userName" value="'%'+sysLog.userName+'%'"/>
+        </if>
+        select count(id) from t_syslog
+        <where>
+            <if test="userName!=null and userName!=''">
+                username like #{pattern_userName}
+            </if>
+        </where>
+    </select>
+
+    <select id="getByName" parameterType="java.lang.String" resultType="top.jsls9.oajsfx.model.SysLog">
+        select id,username,operation,method,params,ip,create_time
+         from t_syslog where username like #{userName}
+    </select>
+
+    <select id="getAll" resultType="top.jsls9.oajsfx.model.SysLog">
+        select id,username,operation,method,params,ip,create_time
+         from t_syslog
+    </select>
+
+</mapper>

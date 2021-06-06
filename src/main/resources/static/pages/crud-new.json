@@ -1,0 +1,94 @@
+{
+  "type": "page",
+  "title": "新增",
+  "remark": null,
+  "toolbar": [
+    {
+      "type": "button",
+      "actionType": "link",
+      "link": "/crud/list",
+      "label": "返回列表"
+    }
+  ],
+  "body": [
+    {
+      "title": "",
+      "type": "form",
+      "redirect": "/crud/list",
+      "name": "sample-edit-form",
+      "api": "/user",
+      "controls": [
+        {
+          "label": "账号",
+          "type": "text",
+          "name": "userName",
+          "labelRemark": {
+            "icon": "fa fa-question-circle",
+            "trigger": [
+              "hover",
+              "focus"
+            ],
+            "className": "Remark--warning",
+            "title": "账号",
+            "content": "账号需要>=6位，且<=18位；且不可重复i"
+          },
+          "description": "",
+          "required": true,
+          "validations": {},
+          "options": [],
+          "addOn": null,
+          "autoComplete": ""
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "text",
+          "label": "密码",
+          "name": "passWord",
+          "required": true,
+          "remark": null,
+          "labelRemark": {
+            "icon": "fa fa-question-circle",
+            "trigger": [
+              "hover",
+              "focus"
+            ],
+            "className": "Remark--warning",
+            "title": "密码",
+            "content": "密码需要>=6位，且<=18位"
+          },
+          "validations": {}
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "checkboxes",
+          "label": "选择角色",
+          "name": "roles",
+          "options": [
+            {
+              "label": "超级管理员",
+              "value": "superAdmin"
+            },
+            {
+              "label": "管理员",
+              "value": "admin"
+            },
+            {
+              "label": "开发者",
+              "value": "dev"
+            }
+          ],
+          "className": "",
+          "source": "/role",
+          "labelClassName": "",
+          "inputClassName": "",
+          "mode": "",
+          "joinValues": true
+        }
+      ]
+    }
+  ]
+}

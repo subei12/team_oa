@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.jsls9.oajsfx.dao.UserDao">
+  <resultMap id="BaseResultMap" type="top.jsls9.oajsfx.model.User">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="salt" jdbcType="VARCHAR" property="salt" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="last_time" jdbcType="TIMESTAMP" property="lastTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="hlx_user_id" jdbcType="VARCHAR" property="hlxUserId" />
+    <result column="hlx_user_nick" jdbcType="VARCHAR" property="hlxUserNick" />
+    <result column="qq" jdbcType="VARCHAR" property="qq" />
+    <result column="dept_id" jdbcType="VARCHAR" property="deptId" />
+    <result column="dept_name" jdbcType="VARCHAR" property="deptName" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, username, `password`, create_time, salt, `state`,hlx_user_id,hlx_user_nick,qq
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select u.id, u.username, u.create_time, u.salt, u.state, u.last_time, u.update_time, u.hlx_user_id, u.hlx_user_nick, u.qq, u.dept_id,d.name dept_name
+    from user u left join Dept d on u.dept_id = d.id
+    where u.id = #{id,jdbcType=VARCHAR}
+  </select>
+  <!--<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from user
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>-->
+  <!-- 要用逻辑删除 -->
+  <update id="deleteByPrimaryKey" parameterType="top.jsls9.oajsfx.model.User">
+    update user
+    set `state` = 1
+    where id in
+    <foreach collection="array" item="id" index="index"
+             open="(" close=")" separator=",">
+      #{id,jdbcType=VARCHAR}
+    </foreach>
+  </update>
+
+
+  <insert id="insert" keyColumn="id" parameterType="top.jsls9.oajsfx.model.User" >
+    <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.String">
+      SELECT uuid()
+    </selectKey>
+    insert into user (id,username, `password`, create_time,
+      salt, `state`)
+    values (#{id},#{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, sysdate(),
+      #{username,jdbcType=VARCHAR}, 0)
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="top.jsls9.oajsfx.model.User" useGeneratedKeys="true">
+    insert into user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+        id,
+      <if test="username != null">
+        username,
+      </if>
+      <if test="password != null">
+        `password`,
+      </if>
+
+        create_time,
+
+      <if test="salt != null">
+        salt,
+      </if>
+      <if test="state != null">
+        `state`,
+      </if>
+
+        `update_time`,
+
+      <if test="hlxUserId != null">
+        `hlx_user_id`,
+      </if>
+      <if test="hlxUserNick != null">
+        `hlx_user_nick`,
+      </if>
+      <if test="qq != null">
+        `qq`,
+      </if>
+      <if test="deptId != null">
+        `dept_id`,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        uuid(),
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      sysdate(),
+      <if test="salt != null">
+        #{salt,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=INTEGER},
+      </if>
+      sysdate(),
+      <if test="hlxUserId != null">
+        #{hlxUserId},
+      </if>
+      <if test="hlxUserNick != null">
+        #{hlxUserNick},
+      </if>
+      <if test="qq != null">
+        #{qq},
+      </if>
+      <if test="deptId != null">
+        #{deptId},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="top.jsls9.oajsfx.model.User">
+    update user
+    <set>
+      <if test="username != null">
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        `password` = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="salt != null">
+        salt = #{salt,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        `state` = #{state,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="top.jsls9.oajsfx.model.User">
+    update user
+    set username = #{username,jdbcType=VARCHAR},
+      `password` = #{password,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      salt = #{salt,jdbcType=VARCHAR},
+      `state` = #{state,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
+  <select id="getUserByUserName" resultMap="BaseResultMap">
+    select u.id, u.username, u.`password`,u.create_time, u.salt, u.state, u.last_time, u.update_time, u.hlx_user_id, u.hlx_user_nick, u.qq, u.dept_id,d.name dept_name
+    from user u left join Dept d on u.dept_id = d.id
+    where u.userName = #{userName,jdbcType=VARCHAR} and u.`state` = 0
+  </select>
+  <select id="getUsers" resultMap="BaseResultMap">
+        select id, username, create_time, state from user where state=0
+  </select>
+  <select id="getCountByUserName" resultType="java.lang.Integer">
+        select count(1) from user where username = #{userName,jdbcType=VARCHAR}
+  </select>
+
+    <select id="getUserCount" resultType="java.lang.Integer">
+        select count(1) from user where state=0
+    </select>
+  <select id="queryUsers" parameterType="top.jsls9.oajsfx.model.User" resultMap="BaseResultMap">
+        select u.id, u.username, u.create_time, u.salt, u.state, u.last_time, u.update_time, u.hlx_user_id, u.hlx_user_nick, u.qq, u.dept_id,d.name dept_name
+        from user u left join Dept d on u.dept_id = d.id
+        <where>
+          <if test="username != null and username!='' ">
+            AND u.username = #{username}
+          </if>
+          <if test="hlxUserId != null and hlxUserId!=''">
+            AND u.hlx_user_id = #{hlxUserId}
+          </if>
+          <if test="deptId != null and deptId!=''">
+            AND u.dept_id = #{deptId}
+          </if>
+          AND u.state=0
+        </where>
+
+  </select>
+
+  <update id="updateUserById" parameterType="top.jsls9.oajsfx.model.User">
+    update user
+    <set>
+      <if test="hlxUserId != null">
+        hlx_user_id = #{hlxUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="hlxUserNick != null">
+        hlx_user_nick = #{hlxUserNick,jdbcType=VARCHAR},
+      </if>
+      <if test="qq != null">
+        `qq` = #{qq,jdbcType=VARCHAR},
+      </if>
+      update_time=sysdate(),
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
+  <!-- 单独使用 -->
+  <update id="updateUserPwdByUserId">
+    update user
+    <set>
+      <if test="password != null">
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      update_time=sysdate(),
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
+</mapper>

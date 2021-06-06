@@ -1,0 +1,124 @@
+{
+  "type": "page",
+  "title": "列表",
+  "remark": null,
+  "name": "page-demo",
+  "toolbar": [
+    {
+      "type": "button",
+      "actionType": "link",
+      "link": "/webDetails/crud/new",
+      "label": "新增黑名单",
+      "primary": true
+    }
+  ],
+  "body": [
+    {
+      "type": "crud",
+      "name": "sample",
+      "api": "/webDetail",
+      "messages": {
+        "fetchSuccess": "请求成功，使用请求的msg覆盖消息"
+      },
+      "filter": {
+        "title": "",
+        "mode": "inline",
+        "wrapWithPanel": false,
+        "submitText": "",
+        "controls": [
+          {
+            "type": "text",
+            "name": "keywords",
+            "placeholder": "通过关键字搜索",
+            "addOn": {
+              "label": "搜索",
+              "type": "submit",
+              "className": "btn-success"
+            },
+            "clearable": true
+          }
+        ],
+        "className": "m-b-sm"
+      },
+      "columns": [
+        {
+          "name": "webPath",
+          "label": "域名",
+          "sortable": true
+        },
+        {
+          "name": "webName",
+          "label": "网站名",
+          "sortable": true
+        },
+        {
+          "name": "webSortName",
+          "label": "分类",
+          "sortable": true
+        },
+        {
+          "name": "state",
+          "label": "状态",
+          "type": "mapping",
+          "map": {
+            "未审核": "<span class='label label-warning'>未审核</span>",
+            "已通过": "<span class='label label-success'>已通过</span>",
+            "未通过": "<span class='label label-danger'>未通过</span>"
+          }
+        },
+        {
+          "name": "startDate",
+          "label": "举报日期",
+          "sortable": true
+        },
+        {
+          "name": "updateDate",
+          "label": "审核日期",
+          "sortable": true
+        },
+        {
+          "name": "updateUserId",
+          "label": "审核人员",
+          "sortable": true
+        },
+        {
+          "type": "operation",
+          "label": "操作",
+          "width": "",
+          "buttons": [
+            {
+              "type": "button-group",
+              "buttons": [
+                {
+                  "type": "button",
+                  "label": "查看",
+                  "level": "primary",
+                  "actionType": "link",
+                  "link": "/webDetails/crud/${id}"
+                },
+                {
+                  "type": "button",
+                  "label": "审核",
+                  "level": "info",
+                  "actionType": "link",
+                  "link": "/webDetails/crud/${id}/edit"
+                }
+              ]
+            }
+          ],
+          "placeholder": "-",
+          "fixed": "right"
+        }
+      ],
+      "affixHeader": true,
+      "columnsTogglable": "auto",
+      "placeholder": "暂无数据",
+      "tableClassName": "table-db table-striped",
+      "headerClassName": "crud-table-header",
+      "footerClassName": "crud-table-footer",
+      "toolbarClassName": "crud-table-toolbar",
+      "combineNum": 0,
+      "bodyClassName": "panel-default"
+    }
+  ]
+}

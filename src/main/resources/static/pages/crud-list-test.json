@@ -1,0 +1,157 @@
+{
+  "title": "浏览器内核对 CSS 的支持情况",
+  "remark": "嘿，不保证数据准确性",
+  "type": "page",
+  "body": {
+    "type": "crud",
+    "draggable": true,
+    "syncLocation": false,
+    "api": "https://3xsw4ap8wah59.cfc-execute.bj.baidubce.com/api/amis-mock/sample",
+    "keepItemSelectionOnPageChange": true,
+    "filter": {
+      "title": "筛选",
+      "submitText": "",
+      "controls": [
+        {
+          "type": "text",
+          "name": "keywords",
+          "placeholder": "关键字",
+          "addOn": {
+            "label": "搜索",
+            "type": "submit"
+          }
+        }
+      ]
+    },
+    "bulkActions": [
+      {
+        "type": "button",
+        "label": "批量删除",
+        "actionType": "ajax",
+        "api": "delete:https://3xsw4ap8wah59.cfc-execute.bj.baidubce.com/api/amis-mock/sample/${ids|raw}",
+        "confirmText": "确定要批量删除?"
+      },
+      {
+        "type": "button",
+        "label": "批量修改",
+        "actionType": "dialog",
+        "dialog": {
+          "title": "批量编辑",
+          "name": "sample-bulk-edit",
+          "body": {
+            "type": "form",
+            "api": "https://3xsw4ap8wah59.cfc-execute.bj.baidubce.com/api/amis-mock/sample/bulkUpdate2",
+            "controls": [
+              {
+                "type": "hidden",
+                "name": "ids"
+              },
+              {
+                "type": "text",
+                "name": "engine",
+                "label": "Engine"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "quickSaveApi": "https://3xsw4ap8wah59.cfc-execute.bj.baidubce.com/api/amis-mock/sample/bulkUpdate",
+    "quickSaveItemApi": "https://3xsw4ap8wah59.cfc-execute.bj.baidubce.com/api/amis-mock/sample/$id",
+    "filterTogglable": true,
+    "headerToolbar": [
+      "filter-toggler",
+      "bulkActions",
+      {
+        "type": "button",
+        "label": "重置测试数据",
+        "actionType": "ajax",
+        "size": "sm",
+        "api": "https://3xsw4ap8wah59.cfc-execute.bj.baidubce.com/api/amis-mock/sample/reset"
+      },
+      "export-excel",
+      {
+        "type": "tpl",
+        "tpl": "一共有 ${count} 行数据。",
+        "className": "v-middle"
+      },
+      {
+        "type": "columns-toggler",
+        "align": "right"
+      },
+      {
+        "type": "drag-toggler",
+        "align": "right"
+      },
+      {
+        "type": "pagination",
+        "align": "right"
+      }
+    ],
+    "footerToolbar": [
+      "statistics",
+      "switch-per-page",
+      "pagination"
+    ],
+    "columns": [
+      {
+        "name": "id",
+        "label": "ID",
+        "width": 20,
+        "sortable": true,
+        "type": "text"
+      },
+      {
+        "name": "engine",
+        "label": "渲染引擎",
+        "sortable": true,
+        "searchable": true,
+        "type": "text",
+        "remark": "Trident 就是 IE，Gecko 就是 Firefox"
+      },
+      {
+        "name": "platform",
+        "label": "平台",
+        "popOver": {
+          "body": {
+            "type": "tpl",
+            "tpl": "就是为了演示有个叫 popOver 的功能"
+          }
+        },
+        "sortable": true,
+        "type": "text"
+      },
+      {
+        "name": "grade",
+        "label": "CSS 等级",
+        "quickEdit": {
+          "mode": "inline",
+          "type": "select",
+          "options": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "X"
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "type": "operation",
+        "label": "操作",
+        "width": 100,
+        "buttons": [
+          {
+            "type": "button",
+            "icon": "fa fa-times text-danger",
+            "actionType": "ajax",
+            "tooltip": "删除",
+            "confirmText": "您确认要删除?",
+            "api": "delete:https://3xsw4ap8wah59.cfc-execute.bj.baidubce.com/api/amis-mock/sample/$id"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "status": 0,
+  "msg": "",
+  "data": {
+    "pages": [
+      {
+        "label": "Home",
+        "url": "/",
+        "redirect": "/crud"
+      },
+      {
+        "label": "网站处理区",
+        "children": [
+          {
+            "label": "网站管理",
+            "schema": {
+              "type": "page",
+              "title": "页面B",
+              "body": "页面B"
+            }
+          },
+          {
+            "label": "分类管理",
+            "url": "/webSort/crud",
+            "rewrite": "/webSort/crud/list",
+            "icon": "fa fa-cube",
+            "children": [
+              {
+                "label": "分类列表",
+                "url": "/webSort/crud/list",
+                "icon": "fa fa-list",
+                "schemaApi": "get:/pages/webSort/crud-list.json"
+              },
+              {
+                "label": "新增分类",
+                "url": "/webSort/crud/new",
+                "icon": "fa fa-plus",
+                "schemaApi": "get:/pages/webSort/crud-new.json"
+              },
+              {
+                "label": "查看",
+                "url": "/webSort/crud/:id",
+                "schemaApi": "get:/pages/webSort/crud-view.json"
+              },
+              {
+                "label": "修改",
+                "url": "/webSort/crud/:id/edit",
+                "schemaApi": "get:/pages/webSort/crud-edit.json"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "系统管理区",
+        "children": [
+          {
+            "label": "用户管理",
+            "url": "/crud",
+            "rewrite": "/crud/list",
+            "icon": "fa fa-cube",
+            "children": [
+              {
+                "label": "列表",
+                "url": "/crud/list",
+                "icon": "fa fa-list",
+                "schemaApi": "get:/pages/crud-list.json"
+              },
+              {
+                "label": "新增",
+                "url": "/crud/new",
+                "icon": "fa fa-plus",
+                "schemaApi": "get:/pages/crud-new.json"
+              },
+              {
+                "label": "查看",
+                "url": "/crud/:id",
+                "schemaApi": "get:/pages/crud-view.json"
+              },
+              {
+                "label": "修改",
+                "url": "/crud/:id/edit",
+                "schemaApi": "get:/pages/crud-edit.json"
+              }
+            ]
+          },
+          {
+            "label": "外部链接",
+            "link": "http://baidu.gitee.io/amis"
+          },
+          {
+            "label": "部门管理",
+            "schemaApi": "/api/mock2/service/form?tpl=tpl3"
+          }
+        ]
+      }
+    ]
+  }
+}

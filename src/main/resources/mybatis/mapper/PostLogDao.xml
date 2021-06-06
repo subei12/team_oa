@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.jsls9.oajsfx.dao.PostLogDao">
+  <resultMap id="BaseResultMap" type="top.jsls9.oajsfx.model.PostLog">
+    <id column="post_id" jdbcType="VARCHAR" property="postId" />
+    <result column="hlx_post_id" jdbcType="VARCHAR" property="hlxPostId" />
+    <result column="hlx_user_id" jdbcType="VARCHAR" property="hlxUserId" />
+    <result column="operation_hlx_user_id" jdbcType="VARCHAR" property="operationHlxUserId" />
+    <result column="create_date" jdbcType="DATE" property="createDate" />
+    <result column="create_state" jdbcType="VARCHAR" property="createState" />
+    <result column="grade" jdbcType="INTEGER" property="grade" />
+    <result column="state" jdbcType="VARCHAR" property="state" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    post_id, hlx_post_id, hlx_user_id, operation_hlx_user_id, create_date, create_state, 
+    grade, `state`
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from post_log
+    where post_id = #{postId,jdbcType=VARCHAR}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from post_log
+    where post_id = #{postId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert"   parameterType="top.jsls9.oajsfx.model.PostLog" >
+    insert into post_log (post_id,hlx_post_id, hlx_user_id, operation_hlx_user_id,
+      create_date, create_state, grade, 
+      `state`)
+    values (uuid(),#{hlxPostId,jdbcType=VARCHAR}, #{hlxUserId,jdbcType=VARCHAR}, #{operationHlxUserId,jdbcType=VARCHAR},
+      sysdate(), #{createState,jdbcType=VARCHAR}, #{grade,jdbcType=INTEGER},
+      #{state,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" keyColumn="post_id" keyProperty="postId" parameterType="top.jsls9.oajsfx.model.PostLog" useGeneratedKeys="true">
+    insert into post_log
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="hlxPostId != null">
+        hlx_post_id,
+      </if>
+      <if test="hlxUserId != null">
+        hlx_user_id,
+      </if>
+      <if test="operationHlxUserId != null">
+        operation_hlx_user_id,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="createState != null">
+        create_state,
+      </if>
+      <if test="grade != null">
+        grade,
+      </if>
+      <if test="state != null">
+        `state`,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="hlxPostId != null">
+        #{hlxPostId,jdbcType=VARCHAR},
+      </if>
+      <if test="hlxUserId != null">
+        #{hlxUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="operationHlxUserId != null">
+        #{operationHlxUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=DATE},
+      </if>
+      <if test="createState != null">
+        #{createState,jdbcType=VARCHAR},
+      </if>
+      <if test="grade != null">
+        #{grade,jdbcType=INTEGER},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="top.jsls9.oajsfx.model.PostLog">
+    update post_log
+    <set>
+      <if test="hlxPostId != null">
+        hlx_post_id = #{hlxPostId,jdbcType=VARCHAR},
+      </if>
+      <if test="hlxUserId != null">
+        hlx_user_id = #{hlxUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="operationHlxUserId != null">
+        operation_hlx_user_id = #{operationHlxUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=DATE},
+      </if>
+      <if test="createState != null">
+        create_state = #{createState,jdbcType=VARCHAR},
+      </if>
+      <if test="grade != null">
+        grade = #{grade,jdbcType=INTEGER},
+      </if>
+      <if test="state != null">
+        `state` = #{state,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where post_id = #{postId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="top.jsls9.oajsfx.model.PostLog">
+    update post_log
+    set
+      grade = #{grade,jdbcType=INTEGER}
+    where post_id = #{postId,jdbcType=VARCHAR}
+  </update>
+
+  <select id="getPostLogByHlxPostId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from post_log
+    where hlx_post_id = #{hlxPostId,jdbcType=VARCHAR} and state = '0'
+  </select>
+
+</mapper>

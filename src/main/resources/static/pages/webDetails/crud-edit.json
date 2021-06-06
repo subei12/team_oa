@@ -1,0 +1,78 @@
+{
+  "type": "page",
+  "title": "修改 ${params.id}",
+  "remark": null,
+  "toolbar": [
+    {
+      "type": "button",
+      "actionType": "link",
+      "link": "/webDetails/crud/list",
+      "label": "返回列表"
+    }
+  ],
+  "body": [
+    {
+      "type": "form",
+      "initApi": "/webDetail/${params.id}",
+      "api": "put:/webDetail/$id",
+      "redirect": "/webDetails/crud/list",
+      "controls": [
+        {
+          "type": "static",
+          "name": "webPath",
+          "label": "域名"
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "static",
+          "name": "webName",
+          "label": "网站名"
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "static",
+          "name": "webSortName",
+          "label": "分类"
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "html",
+          "html": "${webRemarks|raw}",
+          "label": "举报理由："
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "name": "switch",
+          "label": "是否审核通过",
+          "type": "switch",
+          "onText": "同意拉黑",
+          "offText": "拒绝拉黑"
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "rich-text",
+          "name": "adminRemark",
+          "label": "管理员回复",
+          "reciever": "/api/upload/image",
+          "vendor": "tinymce",
+          "options": {
+            "menubar": true,
+            "height": 400,
+            "plugins": "advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking table emoticons template paste help",
+            "toolbar": "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media fullpage | forecolor backcolor emoticons | help"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "type": "page",
+  "title": "查看黑名单提交详情，底下的提交无效，返回请按右上角返回列表。",
+  "remark": null,
+  "toolbar": [
+    {
+      "type": "button",
+      "actionType": "link",
+      "link": "/webDetails/crud/list",
+      "label": "返回列表"
+    }
+  ],
+  "body": [
+    {
+      "type": "form",
+      "initApi": "get:/webDetail/${params.id}",
+      "controls": [
+        {
+          "type": "static",
+          "name": "webPath",
+          "label": "域名"
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "static",
+          "name": "webName",
+          "label": "网站名"
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "static",
+          "name": "webSortName",
+          "label": "分类"
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "name": "state",
+          "label": "状态",
+          "type": "mapping",
+          "map": {
+            "未审核": "<span class='label label-warning'>未审核</span>",
+            "已通过": "<span class='label label-success'>已通过</span>",
+            "未通过": "<span class='label label-danger'>未通过</span>"
+          }
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "html",
+          "html": "${webRemarks|raw}",
+          "label": "举报理由："
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "static",
+          "name": "startDate",
+          "label": "举报日期"
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "static",
+          "name": "updateDate",
+          "label": "审核日期"
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "static",
+          "name": "updateUserId",
+          "label": "审核人员"
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "html",
+          "html": "${adminRemark|raw}",
+          "label": "管理员回复："
+        }
+      ]
+    }
+  ]
+}
