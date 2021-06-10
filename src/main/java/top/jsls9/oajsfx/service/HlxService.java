@@ -12,4 +12,7 @@ public interface HlxService {
     //结算
     Object settlement(String hlxUserId,String postId) throws ParseException, IOException;
 
+    //查询
+    Object getPostsByUserIdNew(String userId) throws IOException, ParseException;
+
 }

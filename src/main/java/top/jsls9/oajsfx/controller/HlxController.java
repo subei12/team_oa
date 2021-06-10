@@ -61,7 +61,7 @@ public class HlxController {
     @RequiresAuthentication //登录才可访问
     @ApiOperation("查询帖子")
     //@RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
-    @GetMapping("/post")
+    @GetMapping("/post_old")
     public RespBean getPostsByUserId(String userId) throws IOException, ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
         if(StringUtil.isBlank(userId)){
@@ -149,5 +149,37 @@ public class HlxController {
         return settlement;
     }
 
+
+    /**
+     * 重构查询方式，使用官方api，每次查询20个，然后第二次使用上一次的start值进一步查询
+     * @return
+     */
+    @RequiresAuthentication //登录才可访问
+    @ApiOperation("查询帖子(新)")
+    //@RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
+    @GetMapping("/post")
+    public RespBean getPostsByUserIdNew(String userId) throws IOException, ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+        if(StringUtil.isBlank(userId)){
+            //获得当前登录用户名
+            Subject subject = SecurityUtils.getSubject();
+            String principal = (String) subject.getPrincipal();
+            //查询登录用户信息
+            User user = userService.getUserByUserName(principal);
+            //参数为空时查询登录用户的帖子
+            userId=user.getHlxUserId();
+            /*logger.info(getName()+"，查询失败，参数缺失");
+            return RespBean.error("查询失败，参数缺失。", Collections.emptyList());*/
+        }
+        //判断是是否为团队成员
+        User user = userService.queryUserByHlxUserId(userId);
+        if(user==null){
+            return RespBean.error("查询失败，此用户不是团队成员。", Collections.emptyList());
+        }
+        //开始查询
+        Object postsByUserIdNew = hlxService.getPostsByUserIdNew(userId);
+
+        return RespBean.success("查询成功",postsByUserIdNew);
+    }
 
 }

@@ -1,16 +1,15 @@
 package top.jsls9.oajsfx.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
+import org.jsoup.Connection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import top.jsls9.oajsfx.controller.HlxController;
 import top.jsls9.oajsfx.dao.PostLogDao;
 import top.jsls9.oajsfx.dao.SendScoreLogDao;
 import top.jsls9.oajsfx.hlxPojo.Post;
+import top.jsls9.oajsfx.hlxPojo.Posts;
 import top.jsls9.oajsfx.hlxPojo.PostsJsonRootBean;
 import top.jsls9.oajsfx.model.PostLog;
 import top.jsls9.oajsfx.model.SendScoreLog;
@@ -18,14 +17,13 @@ import top.jsls9.oajsfx.model.User;
 import top.jsls9.oajsfx.service.HlxService;
 import top.jsls9.oajsfx.service.UserService;
 import top.jsls9.oajsfx.utils.HlxUtils;
+import top.jsls9.oajsfx.utils.HttpUtils;
 import top.jsls9.oajsfx.utils.RespBean;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
+import java.util.*;
 
 /**
  * @author bSu
@@ -193,6 +191,71 @@ public class HlxUserServiceImpl implements HlxService {
             e.printStackTrace();
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    /**
+     * 新的查询方法
+     * @param userId 用户id
+     * @return
+     */
+    @Override
+    public Object getPostsByUserIdNew(String userId) throws IOException, ParseException {
+        String catId = "96";//96表示技术分享板块
+        //开始帖子，第一次为0
+        String start = "0";
+        //标记，是否继续循环
+        boolean flag = true;
+        //结果集合
+        List<Map<String,Object>> listResult = new ArrayList<>();
+        do{
+            String postJsonUrl="http://floor.huluxia.com/post/create/list/ANDROID/2.0?start="+start+"&count=20&user_id="+userId+"&_key="+hlxUtils.getKey();
+            Connection.Response response = HttpUtils.get(postJsonUrl);
+            String body = response.body();
+            JSONObject json=new JSONObject();
+            PostsJsonRootBean jsonRootBean = json.parseObject(response.body(), PostsJsonRootBean.class);
+            List<Posts> posts = jsonRootBean.getPosts();
+            //下一次查询开始的帖子id
+            start = jsonRootBean.getStart();
+            //只查询当月和上月的帖子
+            //获取当月和上月
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
+            Date date = new Date();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date); // 设置为当前时间
+            calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) - 1); // 设置为上一个月
+            date = calendar.getTime();
+
+            for(Posts post : posts){
+                //不是技术分享板块帖子，跳出循环
+                if(!String.valueOf(post.getCategory().getCategoryID()).equals(catId)){
+                    continue;
+                }
+                //只获取一个月内的帖子
+                if(date.getTime()<=post.getCreateTime()){
+                    //获取是否精帖、赞的数量
+                    PostsJsonRootBean postDetails = HlxUtils.getPostDetails(String.valueOf(post.getPostID()));
+                    Map<String,Object> map = new HashMap<>();
+                    map.put("postId",post.getPostID());//帖子id
+                    map.put("title",post.getTitle());//标题
+                    map.put("hit",post.getHit());//浏览量
+                    map.put("praise",postDetails.getPost().getPraise());//赞
+                    map.put("commentCount",post.getCommentCount());//回复数量
+                    map.put("source",post.getScore());//葫芦
+                    map.put("isGood",postDetails.getPost().getIsGood()==1?"是":"否");//是否精贴
+                    map.put("createTime",new SimpleDateFormat("yyyy-MM-dd").format(post.getCreateTime()));//发帖时间
+                    listResult.add(map);
+                }else{
+                    //不是一个月内的帖子，不再参与结算查询，如需结算需要自行抓包，本程序不提供服务（也不是懒，只是不想惯着长时间不结算的毛病）
+                    flag = false;
+                    break;
+                }
+            }
+            //小与20表示本次查询不满，即为已经没有帖子可以用于下次查询
+            if(posts.size()<20){
+                flag = false;
+            }
+        }while (flag);
+        return listResult;
     }
 
 
