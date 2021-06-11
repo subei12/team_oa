@@ -4,7 +4,7 @@ spring:
     username: team_oa
     password: 5FC8PcGitWnE5GkA
     #?serverTimezone=UTC解决时区的报错,我改了host所以是DB01，可以直接换成ip
-    url: jdbc:mysql://DB01/team_oa
+    url: jdbc:mysql://DB01/team_oa?serverTimezone=UTC
     #url: jdbc:mysql://127.0.0.1/team_oa?serverTimezone=UTC
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
@@ -50,4 +50,3 @@ server:
   servlet:
     context-path: /api
   port: 8081
-
