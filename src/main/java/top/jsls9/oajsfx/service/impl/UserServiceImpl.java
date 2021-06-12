@@ -3,6 +3,7 @@ package top.jsls9.oajsfx.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang.StringUtils;
+import org.graalvm.compiler.lir.LIRInstruction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import top.jsls9.oajsfx.dao.RoleDao;
@@ -99,6 +100,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public int updateUserPwdByUserId(User user) {
         return userDao.updateUserPwdByUserId(user);
+    }
+
+    @Override
+    public void updateIntegral(User user) {
+        userDao.updateIntegralByHlxUserId(user);
     }
 
 }

@@ -183,6 +183,13 @@ public class HlxUserServiceImpl implements HlxService {
                 postLog.setGrade(level);
                 postLogDao.updateByPrimaryKey(postLog);
             }
+            //增加积分,目前仅精帖可获得一积分
+            if(level==3){
+                User user = new User();
+                user.setIntegral(1);
+                user.setHlxUserId(hlxUserId);
+                userService.updateIntegral(user);
+            }
             return level;
         }catch (Exception e){
             //保存日志后抛出异常

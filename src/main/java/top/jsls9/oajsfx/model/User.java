@@ -85,6 +85,11 @@ public class User implements Serializable {
      */
     private String roleNames;
 
+    /**
+     * 用户个人积分
+     */
+    private Integer integral;
+
 
 
     private static final long serialVersionUID = 1L;
@@ -217,6 +222,14 @@ public class User implements Serializable {
 
     public void setRoleNames(String roleNames) {
         this.roleNames = roleNames;
+    }
+
+    public Integer getIntegral() {
+        return integral;
+    }
+
+    public void setIntegral(Integer integral) {
+        this.integral = integral;
     }
 
     @Override

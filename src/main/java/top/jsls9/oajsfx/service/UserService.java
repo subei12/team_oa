@@ -34,4 +34,6 @@ public interface UserService {
     User queryUserByHlxUserId(String hlxUserId);
 
     int updateUserPwdByUserId(User userByUserName);
+
+    void updateIntegral(User user);
 }

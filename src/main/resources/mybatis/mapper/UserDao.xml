@@ -15,12 +15,13 @@
     <result column="qq" jdbcType="VARCHAR" property="qq" />
     <result column="dept_id" jdbcType="VARCHAR" property="deptId" />
     <result column="dept_name" jdbcType="VARCHAR" property="deptName" />
+    <result column="integral" jdbcType="INTEGER" property="integral" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, username, `password`, create_time, salt, `state`,hlx_user_id,hlx_user_nick,qq
+    id, username, `password`, create_time, salt, `state`,hlx_user_id,hlx_user_nick,qq,integral
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select u.id, u.username, u.create_time, u.salt, u.state, u.last_time, u.update_time, u.hlx_user_id, u.hlx_user_nick, u.qq, u.dept_id,d.name dept_name
+    select u.id, u.username, u.create_time, u.salt, u.state, u.last_time, u.update_time, u.hlx_user_id, u.hlx_user_nick, u.qq, u.dept_id,d.name dept_name,u.integral
     from user u left join Dept d on u.dept_id = d.id
     where u.id = #{id,jdbcType=VARCHAR}
   </select>
@@ -146,7 +147,7 @@
   </update>
 
   <select id="getUserByUserName" resultMap="BaseResultMap">
-    select u.id, u.username, u.`password`,u.create_time, u.salt, u.state, u.last_time, u.update_time, u.hlx_user_id, u.hlx_user_nick, u.qq, u.dept_id,d.name dept_name
+    select u.id, u.username, u.`password`,u.create_time, u.salt, u.state, u.last_time, u.update_time, u.hlx_user_id, u.hlx_user_nick, u.qq, u.dept_id,d.name dept_name,u.integral
     from user u left join Dept d on u.dept_id = d.id
     where u.userName = #{userName,jdbcType=VARCHAR} and u.`state` = 0
   </select>
@@ -161,7 +162,7 @@
         select count(1) from user where state=0
     </select>
   <select id="queryUsers" parameterType="top.jsls9.oajsfx.model.User" resultMap="BaseResultMap">
-        select u.id, u.username, u.create_time, u.salt, u.state, u.last_time, u.update_time, u.hlx_user_id, u.hlx_user_nick, u.qq, u.dept_id,d.name dept_name
+        select u.id, u.username, u.create_time, u.salt, u.state, u.last_time, u.update_time, u.hlx_user_id, u.hlx_user_nick, u.qq, u.dept_id,d.name dept_name,u.integral
         from user u left join Dept d on u.dept_id = d.id
         <where>
           <if test="username != null and username!='' ">
@@ -201,6 +202,18 @@
     <set>
       <if test="password != null">
         password = #{password,jdbcType=VARCHAR},
+      </if>
+      update_time=sysdate(),
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
+  <!-- 增加用户积分 -->
+  <update id="updateIntegralByHlxUserId">
+    update
+    <set>
+      <if test="integral != 0">
+        integral = integral + #{integral},
       </if>
       update_time=sysdate(),
     </set>
