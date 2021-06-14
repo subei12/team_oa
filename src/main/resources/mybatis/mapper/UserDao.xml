@@ -210,7 +210,7 @@
 
   <!-- 增加用户积分 -->
   <update id="updateIntegralByHlxUserId">
-    update
+    update user
     <set>
       <if test="integral != 0">
         integral = integral + #{integral},

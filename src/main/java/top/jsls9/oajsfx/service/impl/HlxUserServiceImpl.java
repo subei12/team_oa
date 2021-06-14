@@ -185,9 +185,9 @@ public class HlxUserServiceImpl implements HlxService {
             }
             //增加积分,目前仅精帖可获得一积分
             if(level==3){
-                User user = new User();
-                user.setIntegral(1);
-                user.setHlxUserId(hlxUserId);
+                //hlxUserId只是登录用户的，应该给结算帖子的楼主增加积分
+                User user = userService.queryUserByHlxUserId(String.valueOf(post.getUser().getUserID()));
+                user.setIntegral(1);//每次加1
                 userService.updateIntegral(user);
             }
             return level;
