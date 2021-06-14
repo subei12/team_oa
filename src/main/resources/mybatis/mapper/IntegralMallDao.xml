@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.jsls9.oajsfx.dao.IntegralMallDao">
+  <resultMap id="BaseResultMap" type="top.jsls9.oajsfx.model.IntegralMall">
+    <id column="integral_mall_id" jdbcType="VARCHAR" property="integralMallId" />
+    <result column="goods_name" jdbcType="VARCHAR" property="goodsName" />
+    <result column="goods_images" jdbcType="VARCHAR" property="goodsImages" />
+    <result column="goods_price" jdbcType="INTEGER" property="goodsPrice" />
+    <result column="goods_count" jdbcType="INTEGER" property="goodsCount" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="create_user" jdbcType="VARCHAR" property="createUser" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="version" jdbcType="INTEGER" property="version" />
+    <result column="goods_description" jdbcType="VARCHAR" property="goodsDescription" />
+    <result column="user_count" jdbcType="INTEGER" property="userCount" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    integral_mall_id, goods_name, goods_images, goods_price, goods_count, update_date, 
+    create_date, create_user, `state`, version, goods_description, user_count
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from integral_mall
+    where integral_mall_id = #{integralMallId,jdbcType=VARCHAR}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from integral_mall
+    where integral_mall_id = #{integralMallId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" keyColumn="integral_mall_id" keyProperty="integralMallId" parameterType="top.jsls9.oajsfx.model.IntegralMall" useGeneratedKeys="true">
+    insert into integral_mall (goods_name, goods_images, goods_price, 
+      goods_count, update_date, create_date, 
+      create_user, `state`, version, 
+      goods_description, user_count)
+    values (#{goodsName,jdbcType=VARCHAR}, #{goodsImages,jdbcType=VARCHAR}, #{goodsPrice,jdbcType=INTEGER}, 
+      #{goodsCount,jdbcType=INTEGER}, #{updateDate,jdbcType=TIMESTAMP}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{createUser,jdbcType=VARCHAR}, #{state,jdbcType=INTEGER}, #{version,jdbcType=INTEGER}, 
+      #{goodsDescription,jdbcType=VARCHAR}, #{userCount,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" keyColumn="integral_mall_id" keyProperty="integralMallId" parameterType="top.jsls9.oajsfx.model.IntegralMall" useGeneratedKeys="true">
+    insert into integral_mall
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="goodsName != null">
+        goods_name,
+      </if>
+      <if test="goodsImages != null">
+        goods_images,
+      </if>
+      <if test="goodsPrice != null">
+        goods_price,
+      </if>
+      <if test="goodsCount != null">
+        goods_count,
+      </if>
+      <if test="updateDate != null">
+        update_date,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="createUser != null">
+        create_user,
+      </if>
+      <if test="state != null">
+        `state`,
+      </if>
+      <if test="version != null">
+        version,
+      </if>
+      <if test="goodsDescription != null">
+        goods_description,
+      </if>
+      <if test="userCount != null">
+        user_count,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="goodsName != null">
+        #{goodsName,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsImages != null">
+        #{goodsImages,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsPrice != null">
+        #{goodsPrice,jdbcType=INTEGER},
+      </if>
+      <if test="goodsCount != null">
+        #{goodsCount,jdbcType=INTEGER},
+      </if>
+      <if test="updateDate != null">
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUser != null">
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=INTEGER},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=INTEGER},
+      </if>
+      <if test="goodsDescription != null">
+        #{goodsDescription,jdbcType=VARCHAR},
+      </if>
+      <if test="userCount != null">
+        #{userCount,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="top.jsls9.oajsfx.model.IntegralMall">
+    update integral_mall
+    <set>
+      <if test="goodsName != null">
+        goods_name = #{goodsName,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsImages != null">
+        goods_images = #{goodsImages,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsPrice != null">
+        goods_price = #{goodsPrice,jdbcType=INTEGER},
+      </if>
+      <if test="goodsCount != null">
+        goods_count = #{goodsCount,jdbcType=INTEGER},
+      </if>
+      <if test="updateDate != null">
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUser != null">
+        create_user = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        `state` = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="version != null">
+        version = #{version,jdbcType=INTEGER},
+      </if>
+      <if test="goodsDescription != null">
+        goods_description = #{goodsDescription,jdbcType=VARCHAR},
+      </if>
+      <if test="userCount != null">
+        user_count = #{userCount,jdbcType=INTEGER},
+      </if>
+    </set>
+    where integral_mall_id = #{integralMallId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="top.jsls9.oajsfx.model.IntegralMall">
+    update integral_mall
+    set goods_name = #{goodsName,jdbcType=VARCHAR},
+      goods_images = #{goodsImages,jdbcType=VARCHAR},
+      goods_price = #{goodsPrice,jdbcType=INTEGER},
+      goods_count = #{goodsCount,jdbcType=INTEGER},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      create_user = #{createUser,jdbcType=VARCHAR},
+      `state` = #{state,jdbcType=INTEGER},
+      version = #{version,jdbcType=INTEGER},
+      goods_description = #{goodsDescription,jdbcType=VARCHAR},
+      user_count = #{userCount,jdbcType=INTEGER}
+    where integral_mall_id = #{integralMallId,jdbcType=VARCHAR}
+  </update>
+
+  <select id="integralMallList" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from integral_mall
+    where state = 0
+  </select>
+
+</mapper>
