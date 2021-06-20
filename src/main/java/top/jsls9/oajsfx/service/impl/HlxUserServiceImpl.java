@@ -123,32 +123,44 @@ public class HlxUserServiceImpl implements HlxService {
      */
     private Integer sendSourceByLevel(Post post, int level, String hlxUserId, PostLog postLog) throws IOException {
         int source = 0;
+        //积分
+        int integral = 0;
         switch (level){
             case 1:
                 source=25;
+                integral=1;
                 break;
             case 2:
                 source=100;
+                integral=3;
                 break;
             case 3:
                 source=180;
+                integral=5;
                 break;
         }
         //获得上次结算的等级
         //要看是不是为空，待办，没电了拜拜，什么垃圾代码;TODO 结算功能待重构
         int gradeSource = 0;
+        //积分临时变量，用作计算
+        int tempIntegral = 0;
         switch (postLog==null?0:postLog.getGrade()){
             case 0://可能未结算过，勾除的上次结算奖励即为0
                 gradeSource=0;
+                //用这么多会方便计算吗？只是会加代码行数罢了
+                tempIntegral=0;
                 break;
             case 1:
                 gradeSource=25;
+                tempIntegral=1;
                 break;
             case 2:
                 gradeSource=100;
+                tempIntegral=3;
                 break;
             case 3:
                 gradeSource=180;
+                tempIntegral=5;
                 break;
         }
         source = source-gradeSource;
@@ -183,13 +195,12 @@ public class HlxUserServiceImpl implements HlxService {
                 postLog.setGrade(level);
                 postLogDao.updateByPrimaryKey(postLog);
             }
-            //增加积分,目前仅精帖可获得一积分
-            if(level==3){
-                //hlxUserId只是登录用户的，应该给结算帖子的楼主增加积分
-                User user = userService.queryUserByHlxUserId(String.valueOf(post.getUser().getUserID()));
-                user.setIntegral(1);//每次加1
-                userService.updateIntegral(user);
-            }
+            //增加积分
+            //hlxUserId只是登录用户的，应该给结算帖子的楼主增加积分
+            User user = userService.queryUserByHlxUserId(String.valueOf(post.getUser().getUserID()));
+            user.setIntegral(integral-tempIntegral);
+            userService.updateIntegral(user);
+
             return level;
         }catch (Exception e){
             //保存日志后抛出异常
