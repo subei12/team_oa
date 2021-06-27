@@ -36,6 +36,8 @@ spring:
 mybatis:
   type-aliases-package: top.jsls9.top.oajsfx.model
   mapper-locations: classpath:mybatis/mapper/*.xml
+  configuration:
+    local-cache-scope: session #默认为session模式，会影响使用乐观锁重试时查询version，所以改成statement，每次查询结束都会清除一级缓存
 #配置别名
 
 logging:

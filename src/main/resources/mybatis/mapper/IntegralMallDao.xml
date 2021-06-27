@@ -175,4 +175,10 @@
     where state = 0
   </select>
 
+  <!-- 使用乐观锁更新库存 -->
+  <update id="updateGoodsCountByCas" parameterType="top.jsls9.oajsfx.model.IntegralMall">
+        update integral_mall set goods_count=goods_count-1,version=version+1
+        where integral_mall_id=#{integralMallId} and version=#{version}
+  </update>
+
 </mapper>

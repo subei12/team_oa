@@ -23,4 +23,6 @@ public interface IntegralMallDao {
     int updateByPrimaryKey(IntegralMall record);
 
     List<IntegralMall> integralMallList();
+
+    int updateGoodsCountByCas(IntegralMall integralMall);
 }
