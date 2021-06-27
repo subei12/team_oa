@@ -90,7 +90,7 @@ public class UserController {
      * @return
      */
     @ApiOperation("批量删除用户")
-    @RequiresRoles(value = "superAdmin")
+    @RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
     @DeleteMapping("/user/{id}")
     public Object delUsers(@PathVariable("id") String id){
         if(StringUtils.isBlank(id)){
