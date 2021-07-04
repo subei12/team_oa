@@ -52,3 +52,24 @@ server:
   servlet:
     context-path: /api
   port: 8081
+
+
+### xxl-job-executor配置
+xxl:
+  job:
+    admin:
+      addresses: https://xxl.jsls9.top/xxl-job-admin
+    accessToken: su123456789
+    executor:
+      appname: xxl-job-executor-main
+      address: http://76a01a3af688.ngrok.io
+      ip:
+      port: 9999
+      logpath: myLogs/xxl-job/jobhandler
+      logretentiondays: 30
+
+### 自定义配置信息
+hlx:
+  url:
+    #签到
+    signIn: https://floor.huluxia.com/user/signin/IOS/1.1
