@@ -62,7 +62,7 @@ xxl:
     accessToken: su123456789
     executor:
       appname: xxl-job-executor-main
-      address: http://76a01a3af688.ngrok.io
+      address:
       ip:
       port: 9999
       logpath: myLogs/xxl-job/jobhandler
