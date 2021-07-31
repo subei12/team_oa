@@ -7,9 +7,10 @@
     <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
     <result column="create_user_id" jdbcType="VARCHAR" property="createUserId" />
     <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="source" jdbcType="INTEGER" property="source" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, `name`, create_date, create_user_id, `state`
+    id, `name`, create_date, create_user_id, `state`, `source`
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
@@ -100,7 +101,7 @@
 
 
   <select id="getDepts" resultMap="BaseResultMap">
-        select id, name, create_date, create_user_id, state from Dept where state=0
+        select id, name, create_date, create_user_id, state, source from Dept where state=0
   </select>
 
   <update id="updateNameById" parameterType="top.jsls9.oajsfx.model.Dept">
@@ -108,6 +109,9 @@
     <set>
       <if test="name != null">
         `name` = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="source != null">
+        `source` = `source` + #{source,jdbcType=INTEGER},
       </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}

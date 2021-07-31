@@ -3,12 +3,16 @@ package top.jsls9.oajsfx.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
+import org.apache.shiro.subject.Subject;
+import org.jsoup.helper.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import top.jsls9.oajsfx.model.BudgetLog;
 import top.jsls9.oajsfx.model.User;
 import top.jsls9.oajsfx.model.UserRole;
 import top.jsls9.oajsfx.service.UserRoleService;
@@ -26,6 +30,7 @@ import java.util.Map;
 public class UserController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final static String ZZS = "[0-9]+$";
 
     @Autowired
     private UserService userService;
@@ -163,6 +168,47 @@ public class UserController {
         }catch (Exception e){
             e.printStackTrace();
             return RespBean.error("操作，我联系我自己",e.getMessage());
+        }
+    }
+
+    @ApiOperation("自定义发放奖励")
+    @RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
+    @PutMapping("/user/reward/{id}")
+    public RespBean updateUserRewardByUserId(@PathVariable("id") String id,@RequestBody BudgetLog budgetLog){
+        try {
+            if(StringUtil.isBlank(budgetLog.getText()) || budgetLog.getSource()==null){
+                return RespBean.error("参数缺失，奖励失败。");
+            }
+            boolean matches = String.valueOf(budgetLog.getSource()).matches(ZZS);
+            if(budgetLog.getSource()<=0 || !matches){
+                return RespBean.error("奖励失败，奖励数量需要为正整数");
+            }
+
+            //获得当前登录用户对象
+            Subject subject = SecurityUtils.getSubject();
+            User userLogin = userService.getUserLogin();//获取登录用户
+            //admin用户只能结算自己团队的帖子
+            if(!subject.hasRole("superAdmin")){
+                if(subject.hasRole("admin")){
+                   //查询被奖励者团队id
+                   User user = userService.queryUserById(id);
+                   if(!user.getDeptId().equals(userLogin.getDeptId())){
+                       return RespBean.error("奖励失败，您当前无权限奖励此用户。");
+                   }
+                }else{
+                    return RespBean.error("奖励失败，您当前无权限奖励此用户。");
+                }
+            }
+            //此id为用户id
+            budgetLog.setUserId(id);
+
+            budgetLog.setCreateUserId(userLogin.getId());
+            userService.updateUserRewardByUserId(budgetLog);
+            return RespBean.success("奖励发放成功。");
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.error("奖励失败",e);
+            return RespBean.error("奖励失败"+e.getMessage());
         }
     }
 

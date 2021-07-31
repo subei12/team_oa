@@ -1,7 +1,9 @@
 package top.jsls9.oajsfx.service;
 
+import top.jsls9.oajsfx.model.BudgetLog;
 import top.jsls9.oajsfx.model.User;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -36,4 +38,17 @@ public interface UserService {
     int updateUserPwdByUserId(User userByUserName);
 
     void updateIntegral(User user);
+
+    /**公用方法
+     * 获取登录用户信息
+     * @return
+     */
+    User getUserLogin();
+
+    /**
+     * 给用户方法自定义奖励数量
+     * @param budgetLog
+     */
+    void updateUserRewardByUserId(BudgetLog budgetLog) throws IOException;
+
 }

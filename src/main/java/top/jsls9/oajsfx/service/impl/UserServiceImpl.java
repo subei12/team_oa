@@ -3,14 +3,25 @@ package top.jsls9.oajsfx.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import top.jsls9.oajsfx.dao.BudgetLogDao;
+import top.jsls9.oajsfx.dao.DeptDao;
 import top.jsls9.oajsfx.dao.RoleDao;
 import top.jsls9.oajsfx.dao.UserDao;
+import top.jsls9.oajsfx.model.BudgetLog;
+import top.jsls9.oajsfx.model.Dept;
 import top.jsls9.oajsfx.model.Role;
 import top.jsls9.oajsfx.model.User;
 import top.jsls9.oajsfx.service.UserService;
+import top.jsls9.oajsfx.utils.HlxUtils;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -23,12 +34,22 @@ import java.util.Map;
 @Service
 public class UserServiceImpl implements UserService {
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Autowired
     private UserDao userDao;
 
     @Autowired
     private RoleDao roleDao;
 
+    @Autowired
+    private DeptDao deptDao;
+
+    @Autowired
+    private BudgetLogDao budgetLogDao;
+
+    @Autowired
+    private HlxUtils hlxUtils;
 
     @Override
     public Map<String, Object> queryUsersByPageAndUser(Integer pageNum, Integer pageSize, User user) {
@@ -104,6 +125,60 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateIntegral(User user) {
         userDao.updateIntegralByHlxUserId(user);
+    }
+
+    @Override
+    public User getUserLogin() {
+        //获得当前登录用户名
+        Subject subject = SecurityUtils.getSubject();
+        String principal = (String) subject.getPrincipal();
+        //查询登录用户信息
+        User user = getUserByUserName(principal);
+        return user;
+    }
+
+    /**
+     * 发放奖励
+     * 加锁处理，防止超预算
+     * @param budgetLog
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public synchronized void updateUserRewardByUserId(BudgetLog budgetLog) throws IOException {
+
+        //查询当前团队剩余预算
+        User user = userDao.selectByPrimaryKey(budgetLog.getUserId());
+        Dept dept = deptDao.selectByPrimaryKey(user.getDeptId());
+        if(dept.getSource()<budgetLog.getSource()){
+            throw new RuntimeException("当前预算不足，请稍后再试");
+        }
+        //发放奖励
+        String type = "2";//赠送到评论上
+        String commentId = HlxUtils.getNewCommentId(user.getHlxUserId());//最新的回复id
+        if(budgetLog.getSource()<=200){
+            //小于200可以直接赠送
+            hlxUtils.sendSorce(type,commentId,budgetLog.getText(),String.valueOf(budgetLog.getSource()));
+            logger.info("用户："+budgetLog.getUserId()+"，一次性赠送完毕！");
+        }else {
+            for(int i=0;(budgetLog.getSource()/200)>i;i++){
+                hlxUtils.sendSorce(type,commentId,budgetLog.getText(),"200");
+                logger.info("用户："+budgetLog.getUserId()+"，第"+(i+1)+"次赠送200");
+            }
+            if(budgetLog.getSource()%200>0){
+                hlxUtils.sendSorce(type,commentId,budgetLog.getText(),String.valueOf(budgetLog.getSource()%200));
+                logger.info("用户："+budgetLog.getUserId()+"，剩下一次性赠送："+budgetLog.getSource()%200);
+            }
+        }
+        //扣除预算
+        //数量要为负数，这里只用来奖励
+        dept.setSource(-budgetLog.getSource());
+        //必须要有，不然不知道是哪个团队的
+        budgetLog.setDeptId(dept.getId());
+        //修改团队预算
+        deptDao.updateNameById(dept);
+        //插入修改日志
+        budgetLogDao.insert(budgetLog);
+
     }
 
 }

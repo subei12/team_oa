@@ -1,6 +1,7 @@
 package top.jsls9.oajsfx.utils;
 
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -144,6 +145,24 @@ public class HlxUtils {
         PostsJsonRootBean jsonRootBean = json.parseObject(response.body(), PostsJsonRootBean.class);
         List<Posts> posts = jsonRootBean.getPosts();
         return posts;
+    }
+
+    /**
+     * 查询用户最新回复id
+     * @param userId 葫芦侠用户id
+     * @return
+     * @throws IOException
+     */
+    public static String getNewCommentId(String userId) throws IOException {
+        Connection.Response response = HttpUtils.get("https://floor.huluxia.com/comment/create/list/IOS/1.0?device_code=C56DC9ED259045E8885E2E016BD5B5D5&app_version=1.2.2&start=0&platform=1&count=20&user_id="+userId+"&market_id=floor_huluxia");
+        String body =response.body();
+        JSONObject json=new JSONObject();
+        PostsJsonRootBean jsonRootBean = json.parseObject(body, PostsJsonRootBean.class);
+        String commentId=String.valueOf(jsonRootBean.getComments().get(0).getCommentID());
+        if(StringUtils.isBlank(commentId)){
+            throw new RuntimeException("回复id查询失败");
+        }
+        return commentId;
     }
 
 

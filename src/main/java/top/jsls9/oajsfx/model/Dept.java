@@ -33,14 +33,20 @@ public class Dept implements Serializable {
      */
     private Integer state;
 
+    /**
+     * 剩余葫芦
+     */
+    private Integer source;
+
     private static final long serialVersionUID = 1L;
 
-    public Dept(String id, String name, Date createDate, String createUserId, Integer state) {
+    public Dept(String id, String name, Date createDate, String createUserId, Integer state,Integer source) {
         this.id = id;
         this.name = name;
         this.createDate = createDate;
         this.createUserId = createUserId;
         this.state = state;
+        this.source = source;
     }
 
     public Dept() {
@@ -90,6 +96,14 @@ public class Dept implements Serializable {
         return serialVersionUID;
     }
 
+    public Integer getSource() {
+        return source;
+    }
+
+    public void setSource(Integer source) {
+        this.source = source;
+    }
+
     @Override
     public String toString() {
         return "WebSort{" +
@@ -98,6 +112,7 @@ public class Dept implements Serializable {
                 ", createDate=" + createDate +
                 ", createUserId='" + createUserId + '\'' +
                 ", state=" + state +
+                ", source=" + source +
                 '}';
     }
 }

@@ -2,19 +2,25 @@ package top.jsls9.oajsfx.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.log4j.Logger;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
+import org.jsoup.helper.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import top.jsls9.oajsfx.model.BudgetLog;
 import top.jsls9.oajsfx.model.Dept;
+import top.jsls9.oajsfx.model.User;
+import top.jsls9.oajsfx.service.BudgetLogService;
 import top.jsls9.oajsfx.service.DeptService;
+import top.jsls9.oajsfx.service.UserService;
 import top.jsls9.oajsfx.utils.RespBean;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author bSu
@@ -24,10 +30,16 @@ import java.util.List;
 @RestController
 public class DeptController {
 
-    private static Logger logger = Logger.getLogger(DeptController.class);
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private DeptService deptService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private BudgetLogService budgetLogService;
 
     /**
      * 查询全部
@@ -57,5 +69,47 @@ public class DeptController {
             return RespBean.error("查询失败");
         }
     }
+
+    /**
+     * 查询全部部门预算
+     * @return
+     */
+    @ApiOperation("查询全部部门预算")
+    @RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
+    @GetMapping("/dept/budget")
+    public RespBean queryDepts(@RequestParam Integer page, @RequestParam Integer perPage){
+        try {
+            Map<String, Object> deptsByPage = deptService.getDeptsByPage(page, perPage);
+            return RespBean.success("查询成功",deptsByPage);
+        }catch (Exception e){
+            logger.error("查询所有团队预算失败：",e);
+            return RespBean.error("查询失败");
+        }
+    }
+
+
+    @ApiOperation("团队预算修改")
+    @RequiresRoles(value = {"superAdmin"},logical = Logical.OR)
+    @PutMapping("/dept/{id}")
+    public RespBean updateSource(@PathVariable("id") String id,@RequestBody BudgetLog budgetLog){
+        try {
+            if(StringUtil.isBlank(budgetLog.getText()) || budgetLog.getSource()==null){
+                return RespBean.error("参数缺失，修改失败。");
+            }
+            //此id为团队id
+            budgetLog.setDeptId(id);
+            User userLogin = userService.getUserLogin();
+            budgetLog.setCreateUserId(userLogin.getId());
+            //防止出现用户id
+            budgetLog.setUserId("");
+            //其实这个接口不应该写在这个service里面的
+            int i = budgetLogService.updateDeptBudget(budgetLog);
+            return RespBean.success("团队预算修改成功。");
+        }catch (Exception e){
+            logger.error("团队预算修改失败：",e);
+            return RespBean.error("团队预算修改失败。");
+        }
+    }
+
 
 }

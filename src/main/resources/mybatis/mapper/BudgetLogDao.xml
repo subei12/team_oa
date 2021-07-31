@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.jsls9.oajsfx.dao.BudgetLogDao">
+  <resultMap id="BaseResultMap" type="top.jsls9.oajsfx.model.BudgetLog">
+    <id column="budget_log_id" jdbcType="VARCHAR" property="budgetLogId" />
+    <result column="dept_id" jdbcType="VARCHAR" property="deptId" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="source" jdbcType="INTEGER" property="source" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="create_user_id" jdbcType="VARCHAR" property="createUserId" />
+    <result column="text" jdbcType="VARCHAR" property="text" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    budget_log_id, dept_id,user_id, `source`, create_date, create_user_id, `text`
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from budget_log
+    where budget_log_id = #{budgetLogId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from budget_log
+    where budget_log_id = #{budgetLogId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" keyColumn="budget_log_id" keyProperty="budgetLogId" parameterType="top.jsls9.oajsfx.model.BudgetLog" useGeneratedKeys="true">
+    insert into budget_log (budget_log_id,dept_id,user_id, `source`, create_date,
+      create_user_id, `text`)
+    values (uuid(),#{deptId,jdbcType=VARCHAR},#{userId,jdbcType=VARCHAR}, #{source,jdbcType=INTEGER}, sysdate(),
+      #{createUserId,jdbcType=VARCHAR}, #{text,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" keyColumn="budget_log_id" keyProperty="budgetLogId" parameterType="top.jsls9.oajsfx.model.BudgetLog" useGeneratedKeys="true">
+    insert into budget_log
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="deptId != null">
+        dept_id,
+      </if>
+      <if test="source != null">
+        `source`,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="createUserId != null">
+        create_user_id,
+      </if>
+      <if test="text != null">
+        `text`,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="deptId != null">
+        #{deptId,jdbcType=VARCHAR},
+      </if>
+      <if test="source != null">
+        #{source,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUserId != null">
+        #{createUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="text != null">
+        #{text,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="top.jsls9.oajsfx.model.BudgetLog">
+    update budget_log
+    <set>
+      <if test="deptId != null">
+        dept_id = #{deptId,jdbcType=VARCHAR},
+      </if>
+      <if test="source != null">
+        `source` = #{source,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUserId != null">
+        create_user_id = #{createUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="text != null">
+        `text` = #{text,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where budget_log_id = #{budgetLogId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="top.jsls9.oajsfx.model.BudgetLog">
+    update budget_log
+    set dept_id = #{deptId,jdbcType=VARCHAR},
+      `source` = #{source,jdbcType=INTEGER},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      create_user_id = #{createUserId,jdbcType=VARCHAR},
+      `text` = #{text,jdbcType=VARCHAR}
+    where budget_log_id = #{budgetLogId,jdbcType=VARCHAR}
+  </update>
+</mapper>

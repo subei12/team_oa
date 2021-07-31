@@ -2,6 +2,7 @@ package top.jsls9.oajsfx.dao;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
+import top.jsls9.oajsfx.model.BudgetLog;
 import top.jsls9.oajsfx.model.Dept;
 
 import java.util.List;
