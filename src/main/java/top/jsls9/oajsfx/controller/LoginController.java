@@ -196,7 +196,7 @@ public class LoginController {
                     + "\n本次请求的邮件验证码为:<p style='color:red'>" + code + "</p>,本验证码5分钟内有效，请及时输入。（请勿泄露此验证码）\n"
                     + "\n如非本人操作，请忽略该邮件。\n(这是一封自动发送的邮件，请不要直接回复）";
             //异步发送邮件
-            mailUtils.sendHtmlMail(email,"【验证码】黑名单提交",text);
+            mailUtils.sendHtmlMail(email,"【验证码】OA - 注册&改密",text);
             return RespBean.success("验证码发送成功，请留意邮箱查收！");
         }catch (Exception e){
             logger.error("发送邮件验证码失败！！！",e);

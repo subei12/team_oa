@@ -98,11 +98,29 @@ public class UserController {
     @RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
     @DeleteMapping("/user/{id}")
     public Object delUsers(@PathVariable("id") String id){
+        //获得当前登录用户对象
+        Subject subject = SecurityUtils.getSubject();
+        User userLogin = userService.getUserLogin();//获取登录用户
+
         if(StringUtils.isBlank(id)){
             return RespBean.error("参数缺失,删除失败");
         }
         try {
             String[] ids = id.split(",");
+            for(String uId : ids){
+                //admin用户只能结算自己团队的帖子
+                if(!subject.hasRole("superAdmin")){
+                    if(subject.hasRole("admin")){
+                        //查询被奖励者团队id
+                        User user = userService.queryUserById(id);
+                        if(!user.getDeptId().equals(userLogin.getDeptId())){
+                            return RespBean.error("删除失败，包含无权限删除用户。");
+                        }
+                    }else{
+                        return RespBean.error("删除失败，包含无权限删除用户。");
+                    }
+                }
+            }
             userService.delUserById(ids);
             return RespBean.success("删除成功",null);
         }catch (Exception e){
