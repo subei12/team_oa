@@ -26,7 +26,7 @@ public interface UserService {
 
     int updateUserById(User user);
 
-    User queryUserById(String id);
+    User queryUserById(String id) throws IOException;
 
     /**
      * 通过社区id查询用户

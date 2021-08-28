@@ -102,8 +102,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User queryUserById(String id) {
-        return userDao.selectByPrimaryKey(id);
+    public User queryUserById(String id) throws IOException {
+        User user = userDao.selectByPrimaryKey(id);
+        top.jsls9.oajsfx.hlxPojo.User user1 = hlxUtils.queryUserInfo(user.getHlxUserId());
+        user.setNick(user1.getNick());
+        user.setTitle(user1.getIdentityTitle());
+        return user;
     }
 
     @Override

@@ -90,6 +90,15 @@ public class User implements Serializable {
      */
     private Integer integral;
 
+    /**
+     * 补充字段，用户当前佩戴称号
+     */
+    private String title;
+
+    /**
+     * 补充字段，用户当前的社区昵称
+     */
+    private String nick;
 
 
     private static final long serialVersionUID = 1L;
@@ -230,6 +239,22 @@ public class User implements Serializable {
 
     public void setIntegral(Integer integral) {
         this.integral = integral;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getNick() {
+        return nick;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setNick(String nick) {
+        this.nick = nick;
     }
 
     @Override

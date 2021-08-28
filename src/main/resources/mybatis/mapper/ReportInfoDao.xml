@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.jsls9.oajsfx.dao.ReportInfoDao">
+  <resultMap id="BaseResultMap" type="top.jsls9.oajsfx.model.ReportInfo">
+    <id column="report_id" jdbcType="INTEGER" property="reportId" />
+    <result column="process_id" jdbcType="VARCHAR" property="processId" />
+    <result column="create_user_id" jdbcType="VARCHAR" property="createUserId" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="update_user_id" jdbcType="VARCHAR" property="updateUserId" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="top.jsls9.oajsfx.model.ReportInfo">
+    <result column="report_content" jdbcType="BLOB" property="reportContent" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    report_id, process_id, create_user_id, create_date, update_user_id, update_date, 
+    `state`
+  </sql>
+  <sql id="Blob_Column_List">
+    report_content
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from report_info
+    where report_id = #{reportId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from report_info
+    where report_id = #{reportId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="report_id" keyProperty="reportId" parameterType="top.jsls9.oajsfx.model.ReportInfo" useGeneratedKeys="true">
+    insert into report_info (process_id, create_user_id, create_date, 
+      update_user_id, update_date, `state`, 
+      report_content)
+    values (#{processId,jdbcType=VARCHAR}, #{createUserId,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateUserId,jdbcType=VARCHAR}, #{updateDate,jdbcType=TIMESTAMP}, #{state,jdbcType=INTEGER}, 
+      #{reportContent,jdbcType=BLOB})
+  </insert>
+  <insert id="insertSelective" keyColumn="report_id" keyProperty="reportId" parameterType="top.jsls9.oajsfx.model.ReportInfo" useGeneratedKeys="true">
+    insert into report_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="processId != null">
+        process_id,
+      </if>
+      <if test="createUserId != null">
+        create_user_id,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="updateUserId != null">
+        update_user_id,
+      </if>
+      <if test="updateDate != null">
+        update_date,
+      </if>
+      <if test="state != null">
+        `state`,
+      </if>
+      <if test="reportContent != null">
+        report_content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="processId != null">
+        #{processId,jdbcType=VARCHAR},
+      </if>
+      <if test="createUserId != null">
+        #{createUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUserId != null">
+        #{updateUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null">
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=INTEGER},
+      </if>
+      <if test="reportContent != null">
+        #{reportContent,jdbcType=BLOB},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="top.jsls9.oajsfx.model.ReportInfo">
+    update report_info
+    <set>
+      <if test="processId != null">
+        process_id = #{processId,jdbcType=VARCHAR},
+      </if>
+      <if test="createUserId != null">
+        create_user_id = #{createUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUserId != null">
+        update_user_id = #{updateUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null">
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="state != null">
+        `state` = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="reportContent != null">
+        report_content = #{reportContent,jdbcType=BLOB},
+      </if>
+    </set>
+    where report_id = #{reportId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="top.jsls9.oajsfx.model.ReportInfo">
+    update report_info
+    set process_id = #{processId,jdbcType=VARCHAR},
+      create_user_id = #{createUserId,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_user_id = #{updateUserId,jdbcType=VARCHAR},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      `state` = #{state,jdbcType=INTEGER},
+      report_content = #{reportContent,jdbcType=BLOB}
+    where report_id = #{reportId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="top.jsls9.oajsfx.model.ReportInfo">
+    update report_info
+    set process_id = #{processId,jdbcType=VARCHAR},
+      create_user_id = #{createUserId,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_user_id = #{updateUserId,jdbcType=VARCHAR},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      `state` = #{state,jdbcType=INTEGER}
+    where report_id = #{reportId,jdbcType=INTEGER}
+  </update>
+</mapper>

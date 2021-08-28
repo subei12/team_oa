@@ -38,7 +38,7 @@ public class LogAspect {
     /**
      * 定义切面
      */
-    @Pointcut("execution(* top.jsls9.oajsfx.controller.*..*(..))")
+    @Pointcut("execution(* top.jsls9.oajsfx.controller.*..*(..)) && !execution(* top.jsls9.oajsfx.controller.QqMsgWebHookController..*(..))")
     public void log() {
     }
 

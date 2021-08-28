@@ -8,10 +8,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import top.jsls9.oajsfx.hlxPojo.GetKeyRootBean;
-import top.jsls9.oajsfx.hlxPojo.Posts;
-import top.jsls9.oajsfx.hlxPojo.PostsJsonRootBean;
-import top.jsls9.oajsfx.hlxPojo.SendSorceJson;
+import top.jsls9.oajsfx.hlxPojo.*;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -35,6 +32,9 @@ public class HlxUtils {
 
     @Value("${hlx.key.url}")
     private String getKeyUrl;
+
+    @Value("${hlx.url.userInfo}")
+    private String userInfoUrl;
 
     /**
      * 获取key
@@ -163,6 +163,22 @@ public class HlxUtils {
             throw new RuntimeException("回复id查询失败");
         }
         return commentId;
+    }
+
+    /**
+     * 通过userId查询UserInfo，此user类属性不全无法全部转换响应内容，不过也够用了
+     * @param userId
+     * @return
+     * @throws IOException
+     */
+    public User queryUserInfo(String userId) throws IOException {
+        Map<String,String> param = new HashMap<>(2);
+        param.put("_key",getKey());
+        param.put("user_id",userId);
+        Connection.Response post = HttpUtils.post(userInfoUrl, param);
+        JSONObject json=new JSONObject();
+        User user = json.parseObject(post.body(), User.class);
+        return user;
     }
 
 

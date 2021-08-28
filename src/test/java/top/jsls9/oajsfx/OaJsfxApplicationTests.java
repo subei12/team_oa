@@ -1,17 +1,25 @@
 package top.jsls9.oajsfx;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.google.gson.JsonObject;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.DigestUtils;
 import top.jsls9.oajsfx.hlxPojo.PostsJsonRootBean;
+import top.jsls9.oajsfx.hlxPojo.User;
+import top.jsls9.oajsfx.hlxPojo.qqPojo.MessageChain;
 import top.jsls9.oajsfx.utils.HlxUtils;
 import top.jsls9.oajsfx.utils.HttpUtils;
+import top.jsls9.oajsfx.utils.QqSendMsgUtils;
 
+import javax.sound.midi.Soundbank;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @SpringBootTest
 class OaJsfxApplicationTests {
@@ -51,6 +59,33 @@ class OaJsfxApplicationTests {
         System.out.println(l);
         System.out.println(new Date().getTime() - postDetails.getPost().getCreateTime()>= 1000 * 60 * 60 * 24 *3);
 
+    }
+
+    @Test
+    void test04() throws IOException {
+        User user = hlxUtils.queryUserInfo("14057952");
+        System.out.println(user);
+    }
+
+    @Autowired
+    private QqSendMsgUtils qqSendMsgUtils;
+
+    @Test
+    void test05() throws IOException {
+        List<MessageChain> messageChainList = new ArrayList<>();
+        MessageChain messageChain = new MessageChain();
+        messageChain.setType("Plain");
+        String text = "版块：技术分享\n" +
+                "\n" +
+                "处理ID：20634518\n" +
+                "\n" +
+                "处理：下【民间大神】称号\n" +
+                "\n" +
+                "原因：无故退团，无任何原因\n" +
+                " ";
+        messageChain.setText(text);
+        messageChainList.add(messageChain);
+        qqSendMsgUtils.sendGroupMessage("937983527",messageChainList);
     }
 
 }

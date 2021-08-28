@@ -30,7 +30,9 @@ spring:
     maxPoolPreparedStatementPerConnectionSize: 20
     useGlobalDataSourceStat: true
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
-
+  # 本地启动使加上false，用来过滤停掉操作日志
+  aop:
+    auto: true
 
 #整合mybatis，如果mapper和xml不在同一目录，还需要配置关系mybatis.mapper-locations=classpath:mybatis/mapper/*.xml
 mybatis:
@@ -73,3 +75,11 @@ hlx:
   url:
     #签到
     signIn: https://floor.huluxia.com/user/signin/IOS/1.1
+    #用户个人信息
+    userInfo: https://floor.huluxia.com/user/info/IOS/1.1
+qq:
+  url: http://send.frp.jsls9.top
+  verifyKey: su123456
+  number: 3078449526
+  report:
+    group: 279335049

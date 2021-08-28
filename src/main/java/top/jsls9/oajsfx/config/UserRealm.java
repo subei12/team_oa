@@ -61,6 +61,7 @@ public class UserRealm extends AuthorizingRealm {
         if(user.getState()!=0){
             throw new LockedAccountException ("账号不可用，或已被冻结/删除。");
         }
+        //第一个参数明明可以放一个对象，我为什么会放一个userName？真是脑子瓦特了。
         return new SimpleAuthenticationInfo(user.getUsername(),user.getPassword(),getName());
     }
 }

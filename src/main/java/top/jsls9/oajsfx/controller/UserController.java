@@ -19,6 +19,7 @@ import top.jsls9.oajsfx.service.UserRoleService;
 import top.jsls9.oajsfx.service.UserService;
 import top.jsls9.oajsfx.utils.RespBean;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -154,7 +155,7 @@ public class UserController {
     @ApiOperation("通过userId查询用户")
     @RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
     @GetMapping("/user/{id}")
-    public Object getUser(@PathVariable("id") String id){
+    public Object getUser(@PathVariable("id") String id) throws IOException {
         if(StringUtils.isBlank(id)){
             return RespBean.error("参数缺失,查询失败");
         }
