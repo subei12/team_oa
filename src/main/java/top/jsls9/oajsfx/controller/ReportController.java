@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -53,7 +55,7 @@ public class ReportController {
     private ApplicationContext context;
 
     @ApiOperation("上报统一提交接口")
-    //  @RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
+    @RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
     @PostMapping("/report")
     public RespBean doReport(@RequestBody Map<String,Object> map) throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
         try{
