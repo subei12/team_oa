@@ -2,9 +2,11 @@ package top.jsls9.oajsfx.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.apache.shiro.subject.Subject;
 import org.jsoup.helper.StringUtil;
@@ -229,6 +231,15 @@ public class UserController {
             logger.error("奖励失败",e);
             return RespBean.error("奖励失败"+e.getMessage());
         }
+    }
+
+    @ApiOperation("查询登录用户信息")
+    @GetMapping("/user/my")
+    @RequiresAuthentication
+    public RespBean queryLoginUser() throws IOException {
+        User userLogin = userService.getUserLogin();
+        User user = userService.queryUserById(userLogin.getId());
+        return RespBean.success("查询成功",user);
     }
 
 }
