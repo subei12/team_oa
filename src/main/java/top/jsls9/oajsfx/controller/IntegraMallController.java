@@ -24,6 +24,7 @@ import top.jsls9.oajsfx.service.UserService;
 import top.jsls9.oajsfx.utils.RespBean;
 
 import javax.crypto.interfaces.PBEKey;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -116,7 +117,7 @@ public class IntegraMallController {
     @ApiOperation("全局兑换日志")
     @GetMapping("/goodsLogs")
     @RequiresRoles(value = {"superAdmin"},logical = Logical.OR)
-    public RespBean goodsLogs(@RequestParam Integer page, @RequestParam Integer perPage,User user){
+    public RespBean goodsLogs(@RequestParam Integer page, @RequestParam Integer perPage,User user) throws IOException {
         if(StringUtils.isNotBlank(user.getUsername())){
             User userByUserName = userService.getUserByUserName(user.getUsername());
             user.setId(userByUserName.getId());
@@ -127,6 +128,11 @@ public class IntegraMallController {
         PageInfo<IntegralMallLog> pageInfo = new PageInfo<IntegralMallLog>(goodLogList);
         Map<String,Object> map = new HashMap<>();
         List<IntegralMallLog> list = pageInfo.getList();
+        for (IntegralMallLog integralMallLog : list){
+            User user1 = userService.queryUserById(integralMallLog.getUserId());
+            integralMallLog.setHlxUserId(user1.getHlxUserId());
+            integralMallLog.setNick(user1.getNick());
+        }
         map.put("count",pageInfo.getTotal());
         map.put("rows",list);
         return RespBean.success("查询成功",map);

@@ -65,6 +65,16 @@ public class IntegralMallLog implements Serializable {
      */
     private String goodName;
 
+    /**
+     * 补充字段，用于显示用户信息
+     */
+    private String hlxUserId;
+
+    /**
+     * 补充字段，用于显示用户信息
+     */
+    private String nick;
+
     private static final long serialVersionUID = 1L;
 
     public String getIntegralMallLogId() {
@@ -145,5 +155,21 @@ public class IntegralMallLog implements Serializable {
 
     public String getGoodName() {
         return goodName;
+    }
+
+    public String getHlxUserId() {
+        return hlxUserId;
+    }
+
+    public void setHlxUserId(String hlxUserId) {
+        this.hlxUserId = hlxUserId;
+    }
+
+    public String getNick() {
+        return nick;
+    }
+
+    public void setNick(String nick) {
+        this.nick = nick;
     }
 }
