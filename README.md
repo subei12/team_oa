@@ -11,6 +11,32 @@ springboot、shiro、mybatis等
 ### 前端
 使用百度开源项目：[AMIS](https://github.com/baidu/amis)
 
+Nginx配置：
+```bash
+#team-oa
+server {
+    listen       8082;
+    server_name  localhost;
+
+    charset utf-8;
+
+    #access_log  logs/host.access.log  main;
+    
+    location / {
+        root   D:/wordspace_idea/git/Team-OA-WEB;
+        index  index.html index.htm;
+    }
+    location /api {
+        #开启错误拦截配置,一定要开启
+        #proxy_intercept_errors on;
+        #error_page 404 500 502 503 504 =200 http://localhost:8082/login.html;
+        proxy_pass http://localhost:8081/api/;
+        root   html;
+        index  index.html index.htm;
+    }
+}
+```
+
 主要功能：
 
 1. 帖子管理（结算）
