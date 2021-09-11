@@ -10,3 +10,15 @@ springboot、shiro、mybatis等
 
 ### 前端
 使用百度开源项目：[AMIS](https://github.com/baidu/amis)
+
+主要功能：
+
+1. 帖子管理（结算）
+2. 我的信息
+3. 团队人员管理
+4. 积分兑换
+5. 团队预算管理
+6. 上报管理
+
+更新日志：
+见commits
