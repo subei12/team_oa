@@ -27,6 +27,10 @@ server {
         index  index.html index.htm;
     }
     location /api {
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Host $server_name;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         #开启错误拦截配置,一定要开启
         #proxy_intercept_errors on;
         #error_page 404 500 502 503 504 =200 http://localhost:8082/login.html;
