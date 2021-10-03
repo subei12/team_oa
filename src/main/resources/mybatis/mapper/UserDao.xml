@@ -16,12 +16,13 @@
     <result column="dept_id" jdbcType="VARCHAR" property="deptId" />
     <result column="dept_name" jdbcType="VARCHAR" property="deptName" />
     <result column="integral" jdbcType="INTEGER" property="integral" />
+    <result column="gourd" jdbcType="INTEGER" property="gourd" />
   </resultMap>
   <sql id="Base_Column_List">
     id, username, `password`, create_time, salt, `state`,hlx_user_id,hlx_user_nick,qq,integral
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select u.id, u.username, u.create_time, u.salt, u.state, u.last_time, u.update_time, u.hlx_user_id, u.hlx_user_nick, u.qq, u.dept_id,d.name dept_name,u.integral
+    select u.id, u.username, u.create_time, u.salt, u.state, u.last_time, u.update_time, u.hlx_user_id, u.hlx_user_nick, u.qq, u.dept_id,d.name dept_name,u.integral,u.gourd
     from user u left join Dept d on u.dept_id = d.id
     where u.id = #{id,jdbcType=VARCHAR}
   </select>

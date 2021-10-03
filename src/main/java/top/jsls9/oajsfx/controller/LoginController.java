@@ -25,6 +25,8 @@ import top.jsls9.oajsfx.utils.RespBean;
 
 import javax.validation.Valid;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -97,7 +99,10 @@ public class LoginController {
         UsernamePasswordToken token = new UsernamePasswordToken(user.getUserName(),passWord);
         try {
             subject.login(token);
-            return RespBean.success("登录成功",subject.getSession().getId());
+            Map<String,Object> date = new HashMap<>();
+            date.put("token",subject.getSession().getId());
+            date.put("role","admin");
+            return RespBean.success("登录成功",date);
         }catch (LockedAccountException e){
             return RespBean.error(e.getMessage());
         }catch (Exception e){
