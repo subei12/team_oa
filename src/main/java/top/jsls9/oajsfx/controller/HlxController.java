@@ -21,6 +21,7 @@ import top.jsls9.oajsfx.service.HlxService;
 import top.jsls9.oajsfx.service.UserService;
 import top.jsls9.oajsfx.utils.HlxUtils;
 import top.jsls9.oajsfx.utils.HttpUtils;
+import top.jsls9.oajsfx.utils.RedisUtil;
 import top.jsls9.oajsfx.utils.RespBean;
 
 import java.io.IOException;
@@ -40,8 +41,12 @@ public class HlxController {
 
     @Autowired
     private UserService userService;
+
     @Autowired
     private HlxService hlxService;
+
+    @Autowired
+    private RedisUtil redisUtil;
 
 
     private static String getName(){
@@ -170,9 +175,15 @@ public class HlxController {
         if(user==null){
             return RespBean.error("查询失败，此用户不是团队成员。", Collections.emptyList());
         }
+        //查询是否有缓存，如果有就使用缓存
+        Object postList = redisUtil.get("postList:" + userId);
+        if(postList != null){
+            return RespBean.success("查询成功",postList);
+        }
         //开始查询
         Object postsByUserIdNew = hlxService.getPostsByUserIdNew(userId);
-
+        //本次查询未走缓存，添加接口到缓存，缓存8个小时
+        redisUtil.set("postList:" + userId , postsByUserIdNew ,60 * 60 * 8);
         return RespBean.success("查询成功",postsByUserIdNew);
     }
 
