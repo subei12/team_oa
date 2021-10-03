@@ -45,4 +45,6 @@ public interface UserDao {
     int updateUserPwdByUserId(User user);
 
     void updateIntegralByHlxUserId(User user);
+
+    void updateGourdByHlxUserId(User user);
 }

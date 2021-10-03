@@ -221,4 +221,16 @@
     where id = #{id,jdbcType=VARCHAR}
   </update>
 
+  <!-- 修改用户葫芦余额 -->
+  <update id="updateGourdByHlxUserId">
+    update user
+    <set>
+      <if test="gourd != 0">
+        gourd = gourd + #{gourd},
+      </if>
+      update_time=sysdate(),
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
 </mapper>

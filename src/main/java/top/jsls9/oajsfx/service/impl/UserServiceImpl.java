@@ -132,6 +132,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void updateGourdByHlxUserId(User user) {
+        userDao.updateGourdByHlxUserId(user);
+    }
+
+    @Override
     public User getUserLogin() {
         //获得当前登录用户名
         Subject subject = SecurityUtils.getSubject();

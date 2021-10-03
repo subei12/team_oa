@@ -53,7 +53,7 @@ public class HlxUserServiceImpl implements HlxService {
      * @return
      */
     @Override
-    public Object settlement (String hlxUserId, String postId) throws ParseException, IOException {
+    public Object settlement (String hlxUserId, String postId, Integer type) throws ParseException, IOException {
         try {
             //查询是否为团队成员帖子，并且在结算日期内（2021.5.1之后为可结算）
             PostsJsonRootBean postDetails = HlxUtils.getPostDetails(postId);
@@ -80,7 +80,7 @@ public class HlxUserServiceImpl implements HlxService {
             }
             //判断是否为三天前的帖子
             if(!(new Date().getTime() - postDetails.getPost().getCreateTime()>= 1000 * 60 * 60 * 24 *3)){
-                return RespBean.error("结算失败，新帖请在三天后再结算。");
+                //return RespBean.error("结算失败，新帖请在三天后再结算。");
             }
 
             //查询是否已结算过，结算的等级
@@ -104,7 +104,7 @@ public class HlxUserServiceImpl implements HlxService {
                 return RespBean.error("结算失败，此贴已结算过当前可结算最高奖励。");
             }
             //根据等级给帖子结算葫芦
-            Integer integer = sendSourceByLevel(postDetails.getPost(), level, hlxUserId,postLogByHlxPostId);
+            Integer integer = sendSourceByLevel(postDetails.getPost(), level, hlxUserId,postLogByHlxPostId,type);
             return RespBean.success("结算成功。");
         }catch (Exception e){
             logger.error("帖子结算失败，帖子id：【"+postId+"】；"+"原因："+e.getMessage());
@@ -118,10 +118,11 @@ public class HlxUserServiceImpl implements HlxService {
      * @param post  结算帖子详情
      * @param level 本次结算的等级
      * @param hlxUserId 登录用户的葫芦侠id
+     * @param type 结算类型，0-结算到帖子，1-结算到楼主oa账户上
      * @return  当前次结算等级
      * @throws IOException
      */
-    private Integer sendSourceByLevel(Post post, int level, String hlxUserId, PostLog postLog) throws IOException {
+    private Integer sendSourceByLevel(Post post, int level, String hlxUserId, PostLog postLog,Integer type) throws IOException {
         int source = 0;
         //积分
         int integral = 0;
@@ -171,12 +172,23 @@ public class HlxUserServiceImpl implements HlxService {
         //结算操作人，登录用户的
         sendScoreLog.setUserName(hlxUserId);
         try {
-            hlxUtils.sendSorce("1",String.valueOf(post.getPostID()),"奖励结算，当前结算等级："+level+"；少侠辛苦了。",String.valueOf(source));
+            User user = userService.queryUserByHlxUserId(String.valueOf(post.getUser().getUserID()));
+            switch (type){
+                case 0://结算到帖子
+                    hlxUtils.sendSorce("1",String.valueOf(post.getPostID()),"奖励结算，当前结算等级："+level+"；少侠辛苦了。",String.valueOf(source));
+                    sendScoreLog.setState(0);
+                    sendScoreLog.setSourceNumber(source);
+                    //葫芦赠送日志
+                    sendScoreLogDao.insert(sendScoreLog);
+                    break;
+                case 1://结算到楼主oa账户上
+                    user.setGourd(source);
+                    userService.updateGourdByHlxUserId(user);
+                    break;
+            }
+
             logger.info("奖励结算，当前结算等级："+level+"；少侠辛苦了。获得奖励："+source+"。上次结算等级："+String.valueOf(postLog==null?0:postLog.getGrade()));
-            sendScoreLog.setState(0);
-            sendScoreLog.setSourceNumber(source);
-            //葫芦赠送日志
-            sendScoreLogDao.insert(sendScoreLog);
+
             //addOrUpdate帖子结算日志
             //TODO 帖子结算后没有录入结算日志 待测试
             if(postLog==null){
@@ -197,7 +209,6 @@ public class HlxUserServiceImpl implements HlxService {
             }
             //增加积分
             //hlxUserId只是登录用户的，应该给结算帖子的楼主增加积分
-            User user = userService.queryUserByHlxUserId(String.valueOf(post.getUser().getUserID()));
             user.setIntegral(integral-tempIntegral);
             userService.updateIntegral(user);
 

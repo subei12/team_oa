@@ -39,6 +39,8 @@ public interface UserService {
 
     void updateIntegral(User user);
 
+    void updateGourdByHlxUserId(User user);
+
     /**公用方法
      * 获取登录用户信息
      * @return

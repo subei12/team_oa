@@ -93,7 +93,7 @@ public class User implements Serializable {
     /**
      * 用户oa账户剩余葫芦
      */
-    private String gourd;
+    private Integer gourd;
 
     /**
      * 补充字段，用户当前佩戴称号
@@ -246,11 +246,11 @@ public class User implements Serializable {
         this.integral = integral;
     }
 
-    public String getGourd() {
+    public Integer getGourd() {
         return gourd;
     }
 
-    public void setGourd(String gourd) {
+    public void setGourd(Integer gourd) {
         this.gourd = gourd;
     }
 
