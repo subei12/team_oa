@@ -80,7 +80,7 @@ public class HlxUserServiceImpl implements HlxService {
             }
             //判断是否为三天前的帖子
             if(!(new Date().getTime() - postDetails.getPost().getCreateTime()>= 1000 * 60 * 60 * 24 *3)){
-                //return RespBean.error("结算失败，新帖请在三天后再结算。");
+                return RespBean.error("结算失败，新帖请在三天后再结算。");
             }
 
             //查询是否已结算过，结算的等级
