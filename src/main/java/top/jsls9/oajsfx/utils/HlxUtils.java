@@ -80,7 +80,7 @@ public class HlxUtils {
      * @param postId
      */
     public static PostsJsonRootBean getPostDetails(String postId) throws IOException {
-        String postJsonUrl="http://floor.huluxia.com/post/detail/ANDROID/2.3?platform=2&gkey=000000&app_version=4.0.0.9.1&versioncode=20141440&market_id=floor_web&post_id="+postId+"&page_no=1&page_size=20&doc=1";
+        String postJsonUrl="http://floor.huluxia.com/post/detail/IOS/1.1?platform=2&gkey=000000&app_version=4.0.0.9.1&versioncode=20141440&market_id=floor_web&post_id="+postId+"&page_no=1&page_size=20&doc=1";
         Connection.Response response = HttpUtils.get(postJsonUrl);
         String body = response.body();
         JSONObject json=new JSONObject();
