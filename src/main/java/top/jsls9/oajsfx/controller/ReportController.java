@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import top.jsls9.oajsfx.dao.ReportConfigDao;
 import top.jsls9.oajsfx.dao.ReportInfoDao;
+import top.jsls9.oajsfx.exception.ReportException;
 import top.jsls9.oajsfx.model.ReportConfig;
 import top.jsls9.oajsfx.model.ReportInfo;
 import top.jsls9.oajsfx.service.UserService;
 import top.jsls9.oajsfx.utils.RespBean;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -110,6 +112,14 @@ public class ReportController {
             reportInfo.setState(0);
             reportInfoDao.insert(reportInfo);
             return RespBean.success("上报成功，请耐心等待处理。");
+        } catch (InvocationTargetException e) {
+            if (e.getTargetException() instanceof ReportException) {
+                ReportException reportException = (ReportException) e.getTargetException();
+                log.error(reportException.getMessage());
+                return RespBean.error("上报失败；" + reportException.getMessage());
+            }else{
+                return RespBean.error("上报失败",e.getMessage());
+            }
         }catch (Exception e){
             e.printStackTrace();
             log.error(e.getMessage());

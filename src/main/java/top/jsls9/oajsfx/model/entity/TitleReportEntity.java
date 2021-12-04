@@ -6,10 +6,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import top.jsls9.oajsfx.exception.ReportException;
 import top.jsls9.oajsfx.hlxPojo.qqPojo.MessageChain;
 import top.jsls9.oajsfx.utils.QqSendMsgUtils;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,10 +116,29 @@ public class TitleReportEntity extends ReportBaseEntity{
     }
 
 
-    public void doReport() throws IOException {
+    public void doReport() throws Exception {
 
         log.info("+++++++++++++++");
-        log.info("上报中..........");
+        log.info("校验中。。。");
+        //校验
+        if((this.isTop && StringUtils.isBlank(this.title) ||
+                (!this.isTop && StringUtils.isBlank(this.title))) ){
+            //上称号时新称号不得为空，下称号时现称号不得为空
+            throw new ReportException("称号操作失败，请检查后重试");
+        }
+        //上称号时，新称号不得为空
+        if(this.isTop && StringUtils.isBlank(this.newTitle)){
+            throw new ReportException("上称号时，新称号不得为空");
+        }
+        //上称号时，原称号需要为空
+        if(this.isTop && StringUtils.isNotBlank(this.title)){
+            throw new ReportException("上称号时，原称号需要为空");
+        }
+        //下称号时，原称号不得为空
+        if(!this.isTop && StringUtils.isBlank(this.title)){
+            throw new ReportException("下称号时，原称号不得为空");
+        }
+        log.info("校验完成，上报中..........");
         List<MessageChain> messageChainList = new ArrayList<>();
         MessageChain messageChain = new MessageChain();
         messageChain.setType("Plain");
