@@ -2,8 +2,9 @@ package top.jsls9.oajsfx.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.jsoup.Connection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import top.jsls9.oajsfx.dao.PostLogDao;
@@ -32,7 +33,7 @@ import java.util.*;
 @Service
 public class HlxUserServiceImpl implements HlxService {
 
-    private static Logger logger = Logger.getLogger(HlxUserServiceImpl.class);
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private HlxUtils hlxUtils;

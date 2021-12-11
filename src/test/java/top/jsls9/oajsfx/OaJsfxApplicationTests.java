@@ -3,6 +3,11 @@ package top.jsls9.oajsfx;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.JsonObject;
+import com.xxl.job.core.biz.AdminBiz;
+import com.xxl.job.core.biz.client.AdminBizClient;
+import com.xxl.job.core.biz.model.HandleCallbackParam;
+import com.xxl.job.core.biz.model.ReturnT;
+import com.xxl.job.core.context.XxlJobContext;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +23,11 @@ import top.jsls9.oajsfx.utils.QqSendMsgUtils;
 import javax.sound.midi.Soundbank;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 class OaJsfxApplicationTests {
@@ -86,6 +94,33 @@ class OaJsfxApplicationTests {
         messageChain.setText(text);
         messageChainList.add(messageChain);
         qqSendMsgUtils.sendGroupMessage("937983527",messageChainList);
+    }
+
+    // admin-client
+    private static String addressUrl = "https://xxl.jsls9.top/xxl-job-admin/";
+    private static String accessToken = "su123456789";
+
+
+    @Test
+    public void callback() throws Exception {
+        AdminBiz adminBiz = new AdminBizClient(addressUrl, accessToken);
+
+        HandleCallbackParam param = new HandleCallbackParam();
+        param.setLogId(1);
+        param.setHandleCode(XxlJobContext.HANDLE_COCE_SUCCESS);
+
+        List<HandleCallbackParam> callbackParamList = Arrays.asList(param);
+
+        ReturnT<String> returnT = adminBiz.callback(callbackParamList);
+
+        assertTrue(returnT.getCode() == ReturnT.SUCCESS_CODE);
+    }
+
+    @Test
+    public void number(){
+
+
+
     }
 
 }

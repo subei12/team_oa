@@ -23,10 +23,9 @@ spring:
     testOnReturn: false
     poolPreparedStatements: true
 
-    #配置监控统计拦截的filters，stat:监控统计、log4j：日志记录、wall：防御sql注入
-    #如果允许时报错  java.lang.ClassNotFoundException: org.apache.log4j.Priority
-    #则导入 log4j 依赖即可，Maven 地址：https://mvnrepository.com/artifact/log4j/log4j
-    filters: stat,wall,log4j
+    #配置监控统计拦截的filters，stat:监控统计、slf4j：日志记录、wall：防御sql注入
+    #使用logback替换log4j
+    filters: stat,wall,slf4j
     maxPoolPreparedStatementPerConnectionSize: 20
     useGlobalDataSourceStat: true
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
@@ -64,6 +63,7 @@ xxl:
     accessToken: su123456789
     executor:
       appname: xxl-job-executor-main
+      #内网这里要配置http地址，代理的是9999端口
       address:
       ip:
       port: 9999

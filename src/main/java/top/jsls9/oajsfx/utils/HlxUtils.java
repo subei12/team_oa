@@ -2,10 +2,11 @@ package top.jsls9.oajsfx.utils;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import top.jsls9.oajsfx.hlxPojo.*;
@@ -22,7 +23,7 @@ import java.util.Map;
 @Component
 public class HlxUtils {
 
-    private static Logger logger = Logger.getLogger(HlxUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(HlxUtils.class);
 
     //private static final String postAdds = "";
 
