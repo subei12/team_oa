@@ -118,6 +118,14 @@
             <version>1.8.0</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.crazycake/shiro-redis -->
+        <dependency>
+            <groupId>org.crazycake</groupId>
+            <artifactId>shiro-redis</artifactId>
+            <version>3.3.1</version>
+        </dependency>
+
+
 
         <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
         <!--<dependency>

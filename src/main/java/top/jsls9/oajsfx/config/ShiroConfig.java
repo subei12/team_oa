@@ -4,8 +4,12 @@ import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSource
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
+import org.crazycake.shiro.RedisCacheManager;
+import org.crazycake.shiro.RedisManager;
+import org.crazycake.shiro.RedisSessionDAO;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import top.jsls9.oajsfx.auth.MySessionManager;
@@ -25,6 +29,18 @@ import java.util.Map;
 public class ShiroConfig {
 
 
+    @Value("${spring.redis.host}")
+    private String host;
+
+    @Value("${spring.redis.port}")
+    private int port;
+
+    @Value("${spring.redis.password}")
+    private String password;
+
+    @Value("${spring.redis.database}")
+    private int database;
+
     //创建userRealm
     //将自己的验证方式加入容器
     @Bean
@@ -42,6 +58,7 @@ public class ShiroConfig {
         defaultWebSessionManager.setSessionValidationSchedulerEnabled(true);
         defaultWebSessionManager.setSessionIdCookieEnabled(true);*/
         MySessionManager mySessionManager = new MySessionManager();
+        mySessionManager.setSessionDAO(redisSessionDAO());
         return mySessionManager;
         //return defaultWebSessionManager;
     }
@@ -55,6 +72,8 @@ public class ShiroConfig {
         securityManager.setSessionManager(getDefaultWebSessionManager());
         //关联userRealm
         securityManager.setRealm(myShiroRealm);
+        //配置自定义redisCacheManager
+        securityManager.setCacheManager(redisCacheManager());
         return securityManager;
     }
 
@@ -117,6 +136,29 @@ public class ShiroConfig {
         AuthorizationAttributeSourceAdvisor advisor = new AuthorizationAttributeSourceAdvisor();
         advisor.setSecurityManager(securityManager);
         return advisor;
+    }
+
+    //配置redisCacheManager
+    public RedisCacheManager redisCacheManager(){
+        RedisCacheManager redisCacheManager = new RedisCacheManager();
+        redisCacheManager.setRedisManager(redisManager());
+        return redisCacheManager;
+    }
+
+    //配置redisManager
+    public RedisManager redisManager(){
+        RedisManager redisManager = new RedisManager();
+        redisManager.setHost(host+":"+port);
+        redisManager.setDatabase(database);
+        redisManager.setPassword(password);
+        return redisManager;
+    }
+
+    //配置redisSessionDAO
+    public RedisSessionDAO redisSessionDAO(){
+        RedisSessionDAO redisSessionDAO = new RedisSessionDAO();
+        redisSessionDAO.setRedisManager(redisManager());
+        return redisSessionDAO;
     }
 
 }
