@@ -29,7 +29,21 @@ public class ReportConfig implements Serializable {
      */
     private Integer state;
 
+    /**
+     * 配置配型（拿来做公共配置表了）；0-上报配置、1-任务配置
+     */
+    private Integer type;
+
     private static final long serialVersionUID = 1L;
+
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
 
     public String getId() {
         return id;

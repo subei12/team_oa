@@ -7,6 +7,7 @@
     <result column="title_name" jdbcType="VARCHAR" property="titleName" />
     <result column="entity_class" jdbcType="VARCHAR" property="entityClass" />
     <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="type" jdbcType="INTEGER" property="type" />
   </resultMap>
   <sql id="Base_Column_List">
     id, process_id, title_name, entity_class, `state`
@@ -88,7 +89,7 @@
 
 
   <select id="queryConfigByProcessId" resultMap="BaseResultMap">
-        select id, process_id, title_name, entity_class, `state` from report_config where `state`='0' and process_id=#{processId,jdbcType=VARCHAR}
+        select id, process_id, title_name, entity_class, `state` from report_config where `state`='0' and process_id=#{processId,jdbcType=VARCHAR} and `type`=#{type,jdbcType=INTEGER}
   </select>
 
 </mapper>

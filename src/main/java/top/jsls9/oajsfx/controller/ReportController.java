@@ -56,6 +56,9 @@ public class ReportController {
     @Autowired
     private ApplicationContext context;
 
+    //上报类型，0
+    private static final Integer REPORT_TYPE = 0;
+
     @ApiOperation("上报统一提交接口")
     @RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
     @PostMapping("/report")
@@ -65,7 +68,7 @@ public class ReportController {
                 return RespBean.error("上报失败，参数缺失");
             }
             String processId = (String) map.get("processId");
-            ReportConfig reportConfig = reportConfigDao.queryConfigByProcessId(processId);
+            ReportConfig reportConfig = reportConfigDao.queryConfigByProcessId(processId,ReportController.REPORT_TYPE);
             if( reportConfig == null ){
                 return RespBean.error("上报失败，查询不到此格式。");
             }

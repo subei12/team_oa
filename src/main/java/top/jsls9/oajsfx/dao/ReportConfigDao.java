@@ -1,6 +1,7 @@
 package top.jsls9.oajsfx.dao;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 import top.jsls9.oajsfx.model.ReportConfig;
 
@@ -19,5 +20,5 @@ public interface ReportConfigDao {
 
     int updateByPrimaryKey(ReportConfig record);
 
-    ReportConfig queryConfigByProcessId(String processId);
+    ReportConfig queryConfigByProcessId(@Param("processId") String processId, @Param("type") Integer type);
 }
