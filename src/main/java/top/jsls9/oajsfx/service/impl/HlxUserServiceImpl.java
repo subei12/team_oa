@@ -8,19 +8,27 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import top.jsls9.oajsfx.dao.PostLogDao;
+import top.jsls9.oajsfx.dao.PostLogicDao;
 import top.jsls9.oajsfx.dao.SendScoreLogDao;
+import top.jsls9.oajsfx.enums.PostLogicVariable;
 import top.jsls9.oajsfx.hlxPojo.Post;
 import top.jsls9.oajsfx.hlxPojo.Posts;
 import top.jsls9.oajsfx.hlxPojo.PostsJsonRootBean;
 import top.jsls9.oajsfx.model.PostLog;
+import top.jsls9.oajsfx.model.PostLogic;
 import top.jsls9.oajsfx.model.SendScoreLog;
 import top.jsls9.oajsfx.model.User;
 import top.jsls9.oajsfx.service.HlxService;
+import top.jsls9.oajsfx.service.PostLogicService;
 import top.jsls9.oajsfx.service.UserService;
 import top.jsls9.oajsfx.utils.HlxUtils;
 import top.jsls9.oajsfx.utils.HttpUtils;
+import top.jsls9.oajsfx.utils.JsonUtiles;
 import top.jsls9.oajsfx.utils.RespBean;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -43,6 +51,10 @@ public class HlxUserServiceImpl implements HlxService {
     private PostLogDao postLogDao;
     @Autowired
     private SendScoreLogDao sendScoreLogDao;
+    @Autowired
+    private PostLogicDao postLogicDao;
+
+    private static final String SUCCESS = "success";
 
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -56,6 +68,11 @@ public class HlxUserServiceImpl implements HlxService {
     @Override
     public Object settlement (String hlxUserId, String postId, Integer type) throws ParseException, IOException {
         try {
+            //结算前置逻辑判断
+            String logic = postLogic(postId);
+            if(!SUCCESS.equals(logic)){
+                return RespBean.error("结算失败；" + logic);
+            }
             //查询是否为团队成员帖子，并且在结算日期内（2021.5.1之后为可结算）
             PostsJsonRootBean postDetails = HlxUtils.getPostDetails(postId);
             //模拟数据 TODO 记得去掉
@@ -107,11 +124,51 @@ public class HlxUserServiceImpl implements HlxService {
             //根据等级给帖子结算葫芦
             Integer integer = sendSourceByLevel(postDetails.getPost(), level, hlxUserId,postLogByHlxPostId,type);
             return RespBean.success("结算成功。");
+        }catch (IOException e){
+            logger.error("获取帖子详情报错",e.getMessage());
+            return RespBean.error("结算失败，获取帖子详情报错。");
+        }catch (ScriptException e){
+            logger.error("逻辑运算出错",e.getMessage());
+            return RespBean.error("结算失败，逻辑运算出错，请联系管理员。");
         }catch (Exception e){
             logger.error("帖子结算失败，帖子id：【"+postId+"】；"+"原因："+e.getMessage());
             e.printStackTrace();
             return RespBean.error("结算失败，"+e.getMessage());
         }
+    }
+
+    /**
+     * 帖子结算前置逻辑判断
+     * @param postId
+     * @return
+     */
+    public String postLogic(String postId) throws IOException, ScriptException {
+        //运算
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("js");
+
+        String postDetailsToJson = HlxUtils.getPostDetailsToJson(postId);
+        //给所有变量赋值
+        for (PostLogicVariable p : PostLogicVariable.values()) {
+            engine.put("$"+p.getName(), JsonUtiles.getJsonString(postDetailsToJson, p.getValue()));
+        }
+        //获取所有逻辑
+        List<PostLogic> postLogics = postLogicDao.queryPostLogicList();
+        for(PostLogic postLogic : postLogics){
+            if(postLogic.getState() != 0){
+                continue;
+            }
+            if(StringUtils.isBlank(postLogic.getLogic())){
+                continue;
+            }
+            //判断逻辑是为true
+            Object result = engine.eval(postLogic.getLogic());
+            if("java.lang.Boolean".equals(result.getClass().getName()) && (Boolean) result){
+                continue;
+            }
+            return postLogic.getPrompt();
+        }
+        return SUCCESS;
     }
 
     /**

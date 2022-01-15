@@ -182,5 +182,16 @@ public class HlxUtils {
         return user;
     }
 
+    /**
+     * 通过帖子id获取帖子详情(Jsoon)
+     * @param postId
+     */
+    public static String getPostDetailsToJson(String postId) throws IOException {
+        String postJsonUrl="http://floor.huluxia.com/post/detail/IOS/1.1?platform=2&gkey=000000&app_version=4.0.0.9.1&versioncode=20141440&market_id=floor_web&post_id="+postId+"&page_no=1&page_size=20&doc=1";
+        Connection.Response response = HttpUtils.get(postJsonUrl);
+        String body = response.body();
+        return body;
+    }
+
 
 }

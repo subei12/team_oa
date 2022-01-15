@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.jsls9.oajsfx.dao.PostLogicDao">
+  <resultMap id="BaseResultMap" type="top.jsls9.oajsfx.model.PostLogic">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="logic" jdbcType="VARCHAR" property="logic" />
+    <result column="logic_description" jdbcType="VARCHAR" property="logicDescription" />
+    <result column="prompt" jdbcType="VARCHAR" property="prompt" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, logic, logic_description, prompt, create_date, update_date, `state`
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from post_logic
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from post_logic
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="top.jsls9.oajsfx.model.PostLogic" useGeneratedKeys="true">
+    insert into post_logic (logic, logic_description, prompt, 
+      create_date, update_date, `state`
+      )
+    values (#{logic,jdbcType=VARCHAR}, #{logicDescription,jdbcType=VARCHAR}, #{prompt,jdbcType=VARCHAR}, 
+      sysdate(), sysdate(), #{state,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="top.jsls9.oajsfx.model.PostLogic" useGeneratedKeys="true">
+    insert into post_logic
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="logic != null">
+        logic,
+      </if>
+      <if test="logicDescription != null">
+        logic_description,
+      </if>
+      <if test="prompt != null">
+        prompt,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="updateDate != null">
+        update_date,
+      </if>
+      <if test="state != null">
+        `state`,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="logic != null">
+        #{logic,jdbcType=VARCHAR},
+      </if>
+      <if test="logicDescription != null">
+        #{logicDescription,jdbcType=VARCHAR},
+      </if>
+      <if test="prompt != null">
+        #{prompt,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null">
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="top.jsls9.oajsfx.model.PostLogic">
+    update post_logic
+    <set>
+      <if test="logic != null">
+        logic = #{logic,jdbcType=VARCHAR},
+      </if>
+      <if test="logicDescription != null">
+        logic_description = #{logicDescription,jdbcType=VARCHAR},
+      </if>
+      <if test="prompt != null">
+        prompt = #{prompt,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        `state` = #{state,jdbcType=INTEGER},
+      </if>
+      update_date = sysdate()
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="top.jsls9.oajsfx.model.PostLogic">
+    update post_logic
+    set logic = #{logic,jdbcType=VARCHAR},
+      logic_description = #{logicDescription,jdbcType=VARCHAR},
+      prompt = #{prompt,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      `state` = #{state,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+
+  <select id="queryPostLogicList" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from post_logic
+    where `state` != 1
+  </select>
+
+
+  <update id="delete" parameterType="top.jsls9.oajsfx.model.PostLogic">
+    update post_logic
+    set `state` = 1
+    where id in
+    <foreach collection="array" item="id" index="index"
+             open="(" close=")" separator=",">
+      #{id,jdbcType=INTEGER}
+    </foreach>
+  </update>
+
+</mapper>
