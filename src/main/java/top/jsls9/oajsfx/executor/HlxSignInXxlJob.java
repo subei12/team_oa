@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
+import org.apache.commons.lang.StringUtils;
 import org.jsoup.Connection;
-import org.jsoup.helper.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,7 +42,7 @@ public class HlxSignInXxlJob {
         XxlJobHelper.log("自动遍历ID为1-300的版块进行签到，超出300无法签到（已知未有超出的）。");
         //此任务为简单任务，只需传递字符串类型的key
         String key = XxlJobHelper.getJobParam();
-        if(StringUtil.isBlank(key)){
+        if(StringUtils.isBlank(key)){
             XxlJobHelper.log("key为空，签到失败,请确认参数。");
             XxlJobHelper.handleFail("key为空，签到失败");
             return;
@@ -63,7 +63,7 @@ public class HlxSignInXxlJob {
                 Connection.Response result = HttpUtils.post(map,signInUrl, paramMap);
                 JSONObject json= JSON.parseObject(result.body());
                 String msg=json.getString("msg");
-                XxlJobHelper.log("正在签到，版块ID："+i+"；签到结果："+ (StringUtil.isBlank(msg) ?"成功":msg));
+                XxlJobHelper.log("正在签到，版块ID："+i+"；签到结果："+ (StringUtils.isBlank(msg) ?"成功":msg));
             } catch (Exception e){
                 e.printStackTrace();
                 XxlJobHelper.log("签到异常，版块ID："+i+"；异常信息："+ e.getMessage());

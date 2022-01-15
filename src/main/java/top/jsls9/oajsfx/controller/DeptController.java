@@ -2,9 +2,9 @@ package top.jsls9.oajsfx.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
-import org.jsoup.helper.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,7 +93,7 @@ public class DeptController {
     @PutMapping("/dept/{id}")
     public RespBean updateSource(@PathVariable("id") String id,@RequestBody BudgetLog budgetLog){
         try {
-            if(StringUtil.isBlank(budgetLog.getText()) || budgetLog.getSource()==null){
+            if(StringUtils.isBlank(budgetLog.getText()) || budgetLog.getSource()==null){
                 return RespBean.error("参数缺失，修改失败。");
             }
             //此id为团队id

@@ -8,7 +8,6 @@ import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.apache.shiro.subject.Subject;
-import org.jsoup.helper.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -196,7 +195,7 @@ public class UserController {
     @PutMapping("/user/reward/{id}")
     public RespBean updateUserRewardByUserId(@PathVariable("id") String id,@RequestBody BudgetLog budgetLog){
         try {
-            if(StringUtil.isBlank(budgetLog.getText()) || budgetLog.getSource()==null){
+            if(StringUtils.isBlank(budgetLog.getText()) || budgetLog.getSource()==null){
                 return RespBean.error("参数缺失，奖励失败。");
             }
             boolean matches = String.valueOf(budgetLog.getSource()).matches(ZZS);

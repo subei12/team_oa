@@ -3,11 +3,11 @@ package top.jsls9.oajsfx.controller;
 import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.subject.Subject;
 import org.jsoup.Connection;
-import org.jsoup.helper.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +64,7 @@ public class HlxController {
     @GetMapping("/post_old")
     public RespBean getPostsByUserId(String userId) throws IOException, ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
-        if(StringUtil.isBlank(userId)){
+        if(StringUtils.isBlank(userId)){
             //获得当前登录用户名
             Subject subject = SecurityUtils.getSubject();
             String principal = (String) subject.getPrincipal();
@@ -164,7 +164,7 @@ public class HlxController {
     @GetMapping("/post")
     public RespBean getPostsByUserIdNew(String userId) throws IOException, ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
-        if(StringUtil.isBlank(userId)){
+        if(StringUtils.isBlank(userId)){
             //获得当前登录用户名
             Subject subject = SecurityUtils.getSubject();
             String principal = (String) subject.getPrincipal();
