@@ -8,13 +8,17 @@ import com.xxl.job.core.biz.client.AdminBizClient;
 import com.xxl.job.core.biz.model.HandleCallbackParam;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.context.XxlJobContext;
+import com.xxl.job.core.context.XxlJobHelper;
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
+import org.jsoup.Connection;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.DigestUtils;
+import top.jsls9.oajsfx.executor.HlxSignInXxlJob;
 import top.jsls9.oajsfx.hlxPojo.PostsJsonRootBean;
 import top.jsls9.oajsfx.hlxPojo.User;
 import top.jsls9.oajsfx.hlxPojo.qqPojo.MessageChain;
@@ -30,10 +34,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.sound.midi.Soundbank;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -179,6 +180,44 @@ class OaJsfxApplicationTests {
         }
 
 
+    }
+
+    final Integer[] catIds = {1,2,3,4,6,11,15,16,21,22,23,29,34,43,44,45,56,57,58,60,63,67,68,69,70,71,76,77,81,82,84,88,90,92,94,96,98,101,102,103,105,107,108,110,111,112,113,115,116,117};
+    @Test
+    public void hlxSignInJobHandler() throws Exception {
+        logger.info("JobHandler.hlxSignIn开始执行...");
+        logger.info("XXL-JOB, HlxSignInXxlJob.hlxSignInJobHandler执行中开始。。。");
+        logger.info("自动遍历ID为1-300的版块进行签到，超出300无法签到（已知未有超出的）。");
+        //此任务为简单任务，只需传递字符串类型的key
+        String key = "D7DB5D42B072DB665A0EAA84A7B4EE64D8D34F587DD2D3909B344C8291D7EF019B6BD1B2FB83CD0CAF95BD19B6FC48BD6179E9530567DD8B";
+        if(StringUtils.isBlank(key)){
+            XxlJobHelper.log("key为空，签到失败,请确认参数。");
+            XxlJobHelper.handleFail("key为空，签到失败");
+            return;
+        }
+        //设置请求头
+        Map<String,String> map=new HashMap<>();
+        map.put("Content-Type","application/x-www-form-urlencoded");
+        map.put("Connection","close");
+        map.put("Host","floor.huluxia.com");
+        map.put("Accept-Encoding","gzip");
+        map.put("User-Agent","okhttp/3.8.1");
+        for(Integer i : catIds){
+            try {
+                Map<String,String > paramMap=new HashMap();
+                paramMap.put("_key",key);
+                paramMap.put("cat_id",String.valueOf(i));
+                Connection.Response result = HttpUtils.post(map,"https://floor.huluxia.com/user/signin/IOS/1.1", paramMap);
+                JSONObject json= JSON.parseObject(result.body());
+                String msg=json.getString("msg");
+                logger.info("正在签到，版块ID："+i+"；签到结果："+ (StringUtils.isBlank(msg) ?"成功":msg));
+                Thread.sleep(1000);
+            } catch (Exception e){
+                e.printStackTrace();
+                logger.info("签到异常，版块ID："+i+"；异常信息："+ e.getMessage());
+            }
+        }
+        logger.info("JobHandler.hlxSignIn执行结束...");
     }
 
 }

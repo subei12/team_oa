@@ -27,6 +27,8 @@ public class HlxSignInXxlJob {
 
     private static String signInUrl ;
 
+    final Integer[] catIds = {1,2,3,4,6,11,15,16,21,22,23,29,34,43,44,45,56,57,58,60,63,67,68,69,70,71,76,77,81,82,84,88,90,92,94,96,98,101,102,103,105,107,108,110,111,112,113,115,116,117};
+
     @Value("${hlx.url.signIn}")
     public void setSignInUrl(String signInUrl) {
         HlxSignInXxlJob.signInUrl = signInUrl;
@@ -39,7 +41,7 @@ public class HlxSignInXxlJob {
     public void hlxSignInJobHandler() throws Exception {
         logger.info("JobHandler.hlxSignIn开始执行...");
         XxlJobHelper.log("XXL-JOB, HlxSignInXxlJob.hlxSignInJobHandler执行中开始。。。");
-        XxlJobHelper.log("自动遍历ID为1-300的版块进行签到，超出300无法签到（已知未有超出的）。");
+        XxlJobHelper.log("仅签到2022.02.20前已有的板块。");
         //此任务为简单任务，只需传递字符串类型的key
         String key = XxlJobHelper.getJobParam();
         if(StringUtils.isBlank(key)){
@@ -54,7 +56,7 @@ public class HlxSignInXxlJob {
         map.put("Host","floor.huluxia.com");
         map.put("Accept-Encoding","gzip");
         map.put("User-Agent","okhttp/3.8.1");
-        for(int i = 0;i<=300;i++) {
+        for(Integer i : catIds){
             try {
 
                 Map<String,String > paramMap=new HashMap();
@@ -64,6 +66,7 @@ public class HlxSignInXxlJob {
                 JSONObject json= JSON.parseObject(result.body());
                 String msg=json.getString("msg");
                 XxlJobHelper.log("正在签到，版块ID："+i+"；签到结果："+ (StringUtils.isBlank(msg) ?"成功":msg));
+                Thread.sleep(1000);
             } catch (Exception e){
                 e.printStackTrace();
                 XxlJobHelper.log("签到异常，版块ID："+i+"；异常信息："+ e.getMessage());
