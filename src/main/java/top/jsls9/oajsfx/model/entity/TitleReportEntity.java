@@ -121,11 +121,11 @@ public class TitleReportEntity extends ReportBaseEntity{
         log.info("+++++++++++++++");
         log.info("校验中。。。");
         //校验
-        if((this.isTop && StringUtils.isBlank(this.title) ||
+        /**if((this.isTop && StringUtils.isBlank(this.title) ||
                 (!this.isTop && StringUtils.isBlank(this.title))) ){
             //上称号时新称号不得为空，下称号时现称号不得为空
             throw new ReportException("称号操作失败，请检查后重试");
-        }
+        }*/
         //上称号时，新称号不得为空
         if(this.isTop && StringUtils.isBlank(this.newTitle)){
             throw new ReportException("上称号时，新称号不得为空");
