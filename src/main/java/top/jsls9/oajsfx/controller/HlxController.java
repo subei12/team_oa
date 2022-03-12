@@ -192,4 +192,28 @@ public class HlxController {
         return RespBean.success("查询成功",postsByUserIdNew);
     }
 
+    /** 本接口用于支持hlx_hook(xpose模块)结算
+     * 通过帖子id进行结算，每次结算可以结算的最高等级，已结算过最高等级的不可再次结算。
+     * 自助结算等级，一共三个等级；1-普通贴、2热贴、3精帖
+     * @param postId 帖子id
+     * @param type 结算类型，0-结算到帖子，1-结算到楼主oa账户上
+     * @return
+     */
+    @ApiOperation("Hook,结算帖子")
+    //@RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
+    //@RequiresAuthentication
+    @PostMapping("/hook/post/{type}/{postId}")
+    public RespBean settlementByHook(@PathVariable("postId") String postId,@PathVariable("type") Integer type) throws IOException, ParseException {
+        if(type == null){
+            type = 0;
+        }
+        //获得当前登录用户名
+        String principal = "superAdmin";
+        //查询登录用户信息
+        User user = userService.getUserByUserName(principal);
+        //结算
+        RespBean settlement = (RespBean) hlxService.settlement(user.getHlxUserId(), postId, type);
+        return settlement;
+    }
+
 }
