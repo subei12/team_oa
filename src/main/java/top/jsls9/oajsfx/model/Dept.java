@@ -38,15 +38,21 @@ public class Dept implements Serializable {
      */
     private Integer source;
 
+    /**
+     * 结算状态，0-可以结算 1-不可结算
+     */
+    private Integer settlementState;
+
     private static final long serialVersionUID = 1L;
 
-    public Dept(String id, String name, Date createDate, String createUserId, Integer state,Integer source) {
+    public Dept(String id, String name, Date createDate, String createUserId, Integer state,Integer source,Integer settlementState) {
         this.id = id;
         this.name = name;
         this.createDate = createDate;
         this.createUserId = createUserId;
         this.state = state;
         this.source = source;
+        this.settlementState = settlementState;
     }
 
     public Dept() {
@@ -104,6 +110,14 @@ public class Dept implements Serializable {
         this.source = source;
     }
 
+    public void setSettlementState(Integer settlementState) {
+        this.settlementState = settlementState;
+    }
+
+    public Integer getSettlementState() {
+        return settlementState;
+    }
+
     @Override
     public String toString() {
         return "WebSort{" +
@@ -112,7 +126,7 @@ public class Dept implements Serializable {
                 ", createDate=" + createDate +
                 ", createUserId='" + createUserId + '\'' +
                 ", state=" + state +
-                ", source=" + source +
+                ", settlementState=" + settlementState +
                 '}';
     }
 }

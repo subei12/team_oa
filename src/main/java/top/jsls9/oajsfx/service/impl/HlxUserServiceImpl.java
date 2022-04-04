@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import top.jsls9.oajsfx.dao.DeptDao;
 import top.jsls9.oajsfx.dao.PostLogDao;
 import top.jsls9.oajsfx.dao.PostLogicDao;
 import top.jsls9.oajsfx.dao.SendScoreLogDao;
@@ -14,10 +15,7 @@ import top.jsls9.oajsfx.enums.PostLogicVariable;
 import top.jsls9.oajsfx.hlxPojo.Post;
 import top.jsls9.oajsfx.hlxPojo.Posts;
 import top.jsls9.oajsfx.hlxPojo.PostsJsonRootBean;
-import top.jsls9.oajsfx.model.PostLog;
-import top.jsls9.oajsfx.model.PostLogic;
-import top.jsls9.oajsfx.model.SendScoreLog;
-import top.jsls9.oajsfx.model.User;
+import top.jsls9.oajsfx.model.*;
 import top.jsls9.oajsfx.service.HlxService;
 import top.jsls9.oajsfx.service.PostLogicService;
 import top.jsls9.oajsfx.service.UserService;
@@ -53,6 +51,8 @@ public class HlxUserServiceImpl implements HlxService {
     private SendScoreLogDao sendScoreLogDao;
     @Autowired
     private PostLogicDao postLogicDao;
+    @Autowired
+    private DeptDao deptDao;
 
     private static final String SUCCESS = "success";
 
@@ -86,6 +86,13 @@ public class HlxUserServiceImpl implements HlxService {
             if(user==null){
                 return RespBean.error("结算失败，此用户不是团队成员。", Collections.emptyList());
             }
+
+            //判断所属团队是否可以结算
+            Dept dept = deptDao.selectByPrimaryKey(user.getDeptId());
+            if (StringUtils.isBlank(String.valueOf(dept.getSettlementState())) || dept.getSettlementState() == 1){
+                return RespBean.error("结算失败，所属团队：" + dept.getName() + "；不可自助结算。");
+            }
+
             //判断帖子是否可结算
             long createTime = postDetails.getPost().getCreateTime();
             Date parse = sdf.parse("2021-05-01");

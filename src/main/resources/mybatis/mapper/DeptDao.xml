@@ -8,9 +8,10 @@
     <result column="create_user_id" jdbcType="VARCHAR" property="createUserId" />
     <result column="state" jdbcType="INTEGER" property="state" />
     <result column="source" jdbcType="INTEGER" property="source" />
+    <result column="settlement_state" jdbcType="INTEGER" property="settlementState" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, `name`, create_date, create_user_id, `state`, `source`
+    id, `name`, create_date, create_user_id, `state`, `source`, `settlement_state`
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
