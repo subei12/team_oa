@@ -77,6 +77,9 @@ hlx:
     signIn: https://floor.huluxia.com/user/signin/IOS/1.1
     #用户个人信息
     userInfo: https://floor.huluxia.com/user/info/IOS/1.1
+    #板块数据，包含三个维度的帖子列表
+    #hlxCategoryData: https://floor.huluxia.com/home/post/list/IOS/1.1
+    hlxCategoryData: https://floor.huluxia.com/post/list/ANDROID/2.1
 qq:
   url: http://send.frp.jsls9.top
   verifyKey: su123456
