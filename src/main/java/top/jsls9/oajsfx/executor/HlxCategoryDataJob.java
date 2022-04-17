@@ -1,5 +1,6 @@
 package top.jsls9.oajsfx.executor;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.xxl.job.core.context.XxlJobHelper;
@@ -13,13 +14,13 @@ import org.springframework.stereotype.Component;
 import top.jsls9.oajsfx.dao.HlxCategoryDataDao;
 import top.jsls9.oajsfx.hlxPojo.PostsJsonRootBean;
 import top.jsls9.oajsfx.model.HlxCategoryData;
+import top.jsls9.oajsfx.service.HlxCategoryDataService;
 import top.jsls9.oajsfx.utils.HttpUtils;
+import top.jsls9.oajsfx.vo.CategoryHeatVo;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author bSu
@@ -30,10 +31,15 @@ public class HlxCategoryDataJob {
 
     private static Logger logger = LoggerFactory.getLogger(HlxCategoryDataJob.class);
 
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
     private static String hlxCategoryData ;
 
     @Resource
     private HlxCategoryDataDao hlxCategoryDataDao;
+
+    @Autowired
+    private HlxCategoryDataService hlxCategoryDataService;
 
     //id为84的可以签到，但并不是板块，类似首页推荐
     //id为60的板块是"我的关注"，这个板块很奇怪，参数是60但获取到的却为0，也不用参与统计
@@ -62,12 +68,23 @@ public class HlxCategoryDataJob {
         map.put("User-Agent","okhttp/3.8.1");
         Map<String,String > paramMap=new HashMap();
         JSONObject json= new JSONObject();
+
+        //昨日数据
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -1);
+        String format = sdf.format(calendar.getTime());
+        Map<String, Object> hlxCategoryDatasSimple = hlxCategoryDataService.queryHlxCategoryDatasSimple(format);
+        List<CategoryHeatVo> categoryHeatVoList = json.parseArray(
+                JSON.toJSONString(hlxCategoryDatasSimple.get("categoryHeats")),
+                CategoryHeatVo.class);
+
         for(Integer i : catIds){
             try {
 
                 paramMap.put("cat_id",String.valueOf(i));
                 Connection.Response result = HttpUtils.post(map, hlxCategoryData, paramMap);
 
+                //今日数据
                 PostsJsonRootBean jsonRootBean = json.parseObject(result.body(), PostsJsonRootBean.class);
                 logger.info("当前板块名称：{}，当前板块ID：{}，当前板块热度：{}，当前板块贴量：{}",
                         jsonRootBean.getCategory().getTitle(),
@@ -83,9 +100,18 @@ public class HlxCategoryDataJob {
                 HlxCategoryData.CatDate catDate = new HlxCategoryData.CatDate();
                 catDate.setPostCount(jsonRootBean.getCategory().getPostCount());
                 catDate.setViewCount(jsonRootBean.getCategory().getViewCount());
+
+                //计算较作日新增的情况
+                for (CategoryHeatVo categoryHeatVo : categoryHeatVoList){
+                    if(categoryHeatVo.getId().equals(jsonRootBean.getCategory().getCategoryID())){
+                        catDate.setAddViewCount(catDate.getViewCount() - categoryHeatVo.getViewCount());
+                        catDate.setAddPostCount(catDate.getPostCount() - categoryHeatVo.getPostCount());
+                    }
+                }
+
                 hlxCategoryData.setCatData(JSONObject.toJSONString(catDate));
                 //指定参与序列化的属性
-                SimplePropertyPreFilter filter = new SimplePropertyPreFilter(HlxCategoryData.CatDate.class, "viewCount", "postCount");
+                SimplePropertyPreFilter filter = new SimplePropertyPreFilter(HlxCategoryData.CatDate.class, "viewCount", "postCount", "addViewCount", "addPostCount");
                 hlxCategoryData.setCatData(JSONObject.toJSONString(catDate, filter));
                 hlxCategoryDataDao.insert(hlxCategoryData);
             } catch (Exception e){

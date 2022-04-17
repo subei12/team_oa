@@ -17,13 +17,25 @@ public class CategoryHeatVo {
     @ApiModelProperty("板块热度")
     private long viewCount;
 
+    @ApiModelProperty("板块热度")
+    private long postCount;
+
+    @ApiModelProperty("板块热度")
+    private long addViewCount;
+
+    @ApiModelProperty("板块热度")
+    private long addPostCount;
+
     public CategoryHeatVo() {
     }
 
-    public CategoryHeatVo(Integer id, String name, long viewCount) {
+    public CategoryHeatVo(Integer id, String name, long viewCount, long postCount, long addViewCount, long addPostCount) {
         this.id = id;
         this.name = name;
         this.viewCount = viewCount;
+        this.postCount = postCount;
+        this.addViewCount = addViewCount;
+        this.addPostCount = addPostCount;
     }
 
     public Integer getId() {
@@ -50,13 +62,39 @@ public class CategoryHeatVo {
         this.viewCount = viewCount;
     }
 
+    public long getPostCount() {
+        return postCount;
+    }
+
+    public void setPostCount(long postCount) {
+        this.postCount = postCount;
+    }
+
+    public long getAddViewCount() {
+        return addViewCount;
+    }
+
+    public long getAddPostCount() {
+        return addPostCount;
+    }
+
+    public void setAddViewCount(long addViewCount) {
+        this.addViewCount = addViewCount;
+    }
+
+    public void setAddPostCount(long addPostCount) {
+        this.addPostCount = addPostCount;
+    }
+
     @Override
     public String toString() {
         return "CategoryHeatVo{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", viewCount='" + viewCount + '\'' +
+                ", viewCount=" + viewCount +
+                ", postCount=" + postCount +
+                ", addViewCount=" + addViewCount +
+                ", addPostCount=" + addPostCount +
                 '}';
     }
-
 }

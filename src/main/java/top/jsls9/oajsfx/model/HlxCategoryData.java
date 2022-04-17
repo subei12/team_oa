@@ -48,7 +48,7 @@ public class HlxCategoryData implements Serializable {
         private long viewCount;
 
         /**
-         * type = 0 板块热度
+         * type = 0 帖子总数
          */
         private long postCount;
 
@@ -57,13 +57,25 @@ public class HlxCategoryData implements Serializable {
          */
         private long postId;
 
+        /**
+         * type = 0 较昨日新增热度
+         */
+        private long addViewCount;
+
+        /**
+         * type = 0 较昨日新增帖子数量
+         */
+        private long addPostCount;
+
         public CatDate() {
         }
 
-        public CatDate(long viewCount, long postCount, long postId) {
+        public CatDate(long viewCount, long postCount, long postId, long addViewCount, long addPostCount) {
             this.viewCount = viewCount;
             this.postCount = postCount;
             this.postId = postId;
+            this.addViewCount = addViewCount;
+            this.addPostCount = addPostCount;
         }
 
         public long getViewCount() {
@@ -90,12 +102,31 @@ public class HlxCategoryData implements Serializable {
             this.postId = postId;
         }
 
+
+        public long getAddViewCount() {
+            return addViewCount;
+        }
+
+        public long getAddPostCount() {
+            return addPostCount;
+        }
+
+        public void setAddViewCount(long addViewCount) {
+            this.addViewCount = addViewCount;
+        }
+
+        public void setAddPostCount(long addPostCount) {
+            this.addPostCount = addPostCount;
+        }
+
         @Override
         public String toString() {
             return "CatDate{" +
                     "viewCount='" + viewCount + '\'' +
                     ", postCount='" + postCount + '\'' +
                     ", postId='" + postId + '\'' +
+                    ", addViewCount='" + addViewCount + '\'' +
+                    ", addPostCount='" + addPostCount + '\'' +
                     '}';
         }
 

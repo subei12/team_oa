@@ -1,5 +1,7 @@
 package top.jsls9.oajsfx.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sun.rmi.runtime.Log;
@@ -46,12 +48,20 @@ public class HlxCategoryDataServiceImpl implements HlxCategoryDataService {
         //获取最新帖子
         List<HlxCategoryData> dataList1 = hlxCategoryDataDao.selectByDateAndType(date,1);
         List<CategoryHeatVo> categoryHeatVoList = new ArrayList<>();
+        JSONObject json= new JSONObject();
         for(HlxCategoryData hlxCategoryData : dataList){
             CategoryHeatVo vo = new CategoryHeatVo();
             vo.setId(hlxCategoryData.getCatId());
             vo.setName(hlxCategoryData.getCatTitle());
-            String viewCount = JsonUtiles.getJsonString(hlxCategoryData.getCatData(), "viewCount");
-            vo.setViewCount(Long.valueOf(viewCount));
+            HlxCategoryData.CatDate catDate = json.parseObject(hlxCategoryData.getCatData(), HlxCategoryData.CatDate.class);
+            //String viewCount = JsonUtiles.getJsonString(hlxCategoryData.getCatData(), "viewCount");
+            vo.setViewCount(catDate.getViewCount());
+            //String postCount = JsonUtiles.getJsonString(hlxCategoryData.getCatData(), "postCount");
+            vo.setPostCount(catDate.getPostCount());
+            if(catDate.getAddViewCount() != 0){
+                vo.setAddViewCount(catDate.getAddViewCount());
+                vo.setAddPostCount(catDate.getAddPostCount());
+            }
             categoryHeatVoList.add(vo);
         }
         map.put("categoryHeats", categoryHeatVoList);
