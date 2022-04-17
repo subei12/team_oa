@@ -2,7 +2,7 @@ package top.jsls9.oajsfx.hlxPojo.qqPojo;
 
 import java.util.List;
 
-/**
+/** http发送消息bean
  * @author bSu
  * @date 2021/8/28 - 17:58
  */
