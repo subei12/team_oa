@@ -83,7 +83,7 @@ public class ReNameReportEntity extends ReportBaseEntity{
         MessageChain messageChain = new MessageChain();
         messageChain.setType("Plain");
         //正式上报
-        String text = "板块：技术分享\n" +
+        String text = "版块：技术分享\n" +
                 "ID："+this.hlxUserId+"\n" +
                 "原名："+this.nick+"\n" +
                 "改名："+this.newNick+"\n";
