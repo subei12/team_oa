@@ -47,7 +47,7 @@ public class UserController {
      * @return
      */
     @ApiOperation("查询所有用户")
-    @RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
+    //@RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
     @GetMapping("/users")
     public RespBean getUsers(@RequestParam Integer page, @RequestParam Integer perPage, User user){
         try {
@@ -65,7 +65,7 @@ public class UserController {
      * @return
      */
     @ApiOperation("添加用户")
-    @RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
+    //@RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
     @PostMapping("/user")
     public Object addUser(@RequestBody User user){
         try {
@@ -96,7 +96,7 @@ public class UserController {
      * @return
      */
     @ApiOperation("批量删除用户")
-    @RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
+    //@RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
     @DeleteMapping("/user/{id}")
     public Object delUsers(@PathVariable("id") String id){
         //获得当前登录用户对象
@@ -137,7 +137,7 @@ public class UserController {
      * @return
      */
     @ApiOperation("修改用户信息")
-    @RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
+    //@RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
     @PutMapping("/user/{id}")
     public Object updateUser(@RequestBody User user,@PathVariable("id") String id){
         if(StringUtils.isBlank(id)){
@@ -153,7 +153,7 @@ public class UserController {
      * @return
      */
     @ApiOperation("通过userId查询用户")
-    @RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
+    //@RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
     @GetMapping("/user/{id}")
     public Object getUser(@PathVariable("id") String id) throws IOException {
         if(StringUtils.isBlank(id)){
@@ -163,6 +163,7 @@ public class UserController {
         return RespBean.success("查询成功",user);
     }
 
+    /* 重构角色、权限管理
     @ApiOperation("给用户赋予角色")
     @RequiresRoles(value = {"superAdmin"},logical = Logical.OR)
     @PutMapping("/user/role/{id}")
@@ -188,10 +189,10 @@ public class UserController {
             e.printStackTrace();
             return RespBean.error("操作，我联系我自己",e.getMessage());
         }
-    }
+    }*/
 
     @ApiOperation("自定义发放奖励")
-    @RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
+    //@RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
     @PutMapping("/user/reward/{id}")
     public RespBean updateUserRewardByUserId(@PathVariable("id") String id,@RequestBody BudgetLog budgetLog){
         try {

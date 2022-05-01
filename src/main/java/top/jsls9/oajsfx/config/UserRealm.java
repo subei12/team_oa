@@ -6,10 +6,14 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
+import top.jsls9.oajsfx.dao.PermissionDao;
 import top.jsls9.oajsfx.dao.RoleDao;
+import top.jsls9.oajsfx.model.Permission;
 import top.jsls9.oajsfx.model.Role;
 import top.jsls9.oajsfx.model.User;
 import top.jsls9.oajsfx.service.LoginService;
+import top.jsls9.oajsfx.service.PermissionService;
+import top.jsls9.oajsfx.service.UserService;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,14 +32,27 @@ public class UserRealm extends AuthorizingRealm {
     @Autowired
     private RoleDao roleDao;
 
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private PermissionService permissionService;
+
     //授权，即角色或者权限验证。
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         System.out.println("授权--》AuthorizationInfo");
         //获取登录信息，认证成功之后给一个name，这里应该只要是个唯一的值就行，对应下面new SimpleAuthenticationInfo()的第一个参数
-        String name = (String) principalCollection.getPrimaryPrincipal();
+        User userLogin = userService.getUserLogin();
         SimpleAuthorizationInfo info =new SimpleAuthorizationInfo();
-        List<Role> roles = roleDao.queryRoleByUserName(name);
+
+        //资源权限
+        List<Permission> permissions = permissionService.selectAllByUserId(userLogin.getId());
+        for(Permission p : permissions){
+            info.addStringPermission(p.getPerms());
+        }
+
+        List<Role> roles = roleDao.queryRoleByUserName(userLogin.getUsername());
         //移除所有的null元素
         roles.removeAll(Collections.singleton(null));
         //授权

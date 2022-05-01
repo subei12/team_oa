@@ -1,20 +1,36 @@
 package top.jsls9.oajsfx.config;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.crazycake.shiro.RedisCacheManager;
 import org.crazycake.shiro.RedisManager;
 import org.crazycake.shiro.RedisSessionDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import top.jsls9.oajsfx.auth.MyPathMatchingFilterChainResolver;
+import top.jsls9.oajsfx.auth.MyPermissionsAuthorizationFilter;
 import top.jsls9.oajsfx.auth.MySessionManager;
+import top.jsls9.oajsfx.auth.MyShiroFilterFactoryBean;
+import top.jsls9.oajsfx.model.Permission;
+import top.jsls9.oajsfx.model.User;
+import top.jsls9.oajsfx.service.PermissionService;
+import top.jsls9.oajsfx.service.UserService;
 
+import javax.servlet.Filter;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,6 +44,7 @@ import java.util.Map;
 @Configuration//声明为配置类
 public class ShiroConfig {
 
+    private static final Logger log = LoggerFactory.getLogger(ShiroConfig.class);
 
     @Value("${spring.redis.host}")
     private String host;
@@ -40,6 +57,17 @@ public class ShiroConfig {
 
     @Value("${spring.redis.database}")
     private int database;
+
+    /**
+     * 区分url method
+     */
+    public final static String SEPARATOR_SHIRO_PERM = "==";
+
+    @Autowired
+    private PermissionService permissionService;
+
+    @Autowired
+    private UserService userService;
 
     //创建userRealm
     //将自己的验证方式加入容器
@@ -80,9 +108,14 @@ public class ShiroConfig {
     //Filter工厂，设置对应的过滤条件和跳转条件
     @Bean
     public ShiroFilterFactoryBean shiroFilterFactoryBean(@Qualifier("securityManager") DefaultWebSecurityManager securityManager) {
-        ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
+        ShiroFilterFactoryBean shiroFilterFactoryBean = new MyShiroFilterFactoryBean();
         //配置安全管理器
         shiroFilterFactoryBean.setSecurityManager(securityManager);
+
+        //更换过滤器
+        Map<String, Filter> filters = shiroFilterFactoryBean.getFilters();
+        filters.put("perms", new MyPermissionsAuthorizationFilter());
+
         Map<String, String> map = new HashMap<>();
         //登出
         //map.put("/logout", "logout");
@@ -98,7 +131,10 @@ public class ShiroConfig {
         //shiroFilterFactoryBean.setSuccessUrl("/index");
         //错误页面，认证不通过跳转
         //shiroFilterFactoryBean.setUnauthorizedUrl("/error");
-        shiroFilterFactoryBean.setFilterChainDefinitionMap(map);
+
+        //获取用户的所有权限，上面的其实一直没什么用
+        Map<String, String> urlPermsMap = getUrlPermsMap();
+        shiroFilterFactoryBean.setFilterChainDefinitionMap(urlPermsMap);
         return shiroFilterFactoryBean;
     }
 
@@ -160,5 +196,32 @@ public class ShiroConfig {
         redisSessionDAO.setRedisManager(redisManager());
         return redisSessionDAO;
     }
+
+    /* 拓展权限 */
+
+
+    /**
+     * 获取用户权限
+     * @return
+     */
+    public Map<String, String> getUrlPermsMap() {
+        Map<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
+
+        filterChainDefinitionMap.put("/favicon.ico", "anon");
+        filterChainDefinitionMap.put("/login", "anon");
+
+
+        List<Permission> menus = permissionService.selectAll();
+        for (Permission menu : menus) {
+            //url先不加context-path: /api
+            String url = menu.getUrl();
+            String perms = "perms[" + menu.getPerms() + "]";
+            filterChainDefinitionMap.put(url, perms);
+        }
+        /* 我这个除配置的url外其他都不需要登录 */
+        //filterChainDefinitionMap.put("/**", "authc");
+        return filterChainDefinitionMap;
+    }
+
 
 }

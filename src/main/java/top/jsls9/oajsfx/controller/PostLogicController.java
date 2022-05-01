@@ -19,7 +19,7 @@ import top.jsls9.oajsfx.utils.RespBean;
  * @date 2022/1/8 - 17:15
  */
 @Api(tags = "帖子结算前置逻辑接口")
-@RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
+//@RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
 @RestController
 public class PostLogicController {
 
