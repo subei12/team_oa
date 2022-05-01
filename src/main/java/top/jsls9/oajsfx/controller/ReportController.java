@@ -60,7 +60,7 @@ public class ReportController {
     private static final Integer REPORT_TYPE = 0;
 
     @ApiOperation("上报统一提交接口")
-    @RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
+    //@RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
     @PostMapping("/report")
     public RespBean doReport(@RequestBody Map<String,Object> map) throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
         try{

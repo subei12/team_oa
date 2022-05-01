@@ -116,7 +116,7 @@ public class IntegraMallController {
      */
     @ApiOperation("全局兑换日志")
     @GetMapping("/goodsLogs")
-    @RequiresRoles(value = {"superAdmin"},logical = Logical.OR)
+    //@RequiresRoles(value = {"superAdmin"},logical = Logical.OR)
     public RespBean goodsLogs(@RequestParam Integer page, @RequestParam Integer perPage,User user) throws IOException {
         if(StringUtils.isNotBlank(user.getUsername())){
             User userByUserName = userService.getUserByUserName(user.getUsername());
@@ -146,7 +146,7 @@ public class IntegraMallController {
      */
     @ApiOperation("处理兑换")
     @PutMapping("/updateGoodsLog/{id}")
-    @RequiresRoles(value = {"superAdmin"},logical = Logical.OR)
+    //@RequiresRoles(value = {"superAdmin"},logical = Logical.OR)
     public RespBean updateGoodsLog(@PathVariable("id") String id,@RequestBody IntegralMallLog integralMallLog){
         integralMallLog.setIntegralMallLogId(id);
         integralMallLog.setUpdateDate(new Date());

@@ -46,7 +46,7 @@ public class DeptController {
      * @return
      */
     @ApiOperation("查询全部部门")
-    @RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
+    //@RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
     @GetMapping("/depts")
     public Object getDepts(){
         try {
@@ -75,7 +75,7 @@ public class DeptController {
      * @return
      */
     @ApiOperation("查询全部部门预算")
-    @RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
+    //@RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)
     @GetMapping("/dept/budget")
     public RespBean queryDepts(@RequestParam Integer page, @RequestParam Integer perPage){
         try {
@@ -89,7 +89,7 @@ public class DeptController {
 
 
     @ApiOperation("团队预算修改")
-    @RequiresRoles(value = {"superAdmin"},logical = Logical.OR)
+    //@RequiresRoles(value = {"superAdmin"},logical = Logical.OR)
     @PutMapping("/dept/{id}")
     public RespBean updateSource(@PathVariable("id") String id,@RequestBody BudgetLog budgetLog){
         try {
