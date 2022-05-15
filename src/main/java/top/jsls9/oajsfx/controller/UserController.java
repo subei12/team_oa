@@ -108,20 +108,9 @@ public class UserController {
         }
         try {
             String[] ids = id.split(",");
-            for(String uId : ids){
-                //admin用户只能结算自己团队的帖子
-                if(!subject.hasRole("superAdmin")){
-                    if(subject.hasRole("admin")){
-                        //查询被奖励者团队id
-                        User user = userService.queryUserById(id);
-                        if(!user.getDeptId().equals(userLogin.getDeptId())){
-                            return RespBean.error("删除失败，包含无权限删除用户。");
-                        }
-                    }else{
-                        return RespBean.error("删除失败，包含无权限删除用户。");
-                    }
-                }
-            }
+            /**
+             * 移除数据权限控制，没错，摆烂了。数据权限控制太麻烦了，只在查询里控制了。
+             */
             userService.delUserById(ids);
             return RespBean.success("删除成功",null);
         }catch (Exception e){
@@ -200,7 +189,7 @@ public class UserController {
             Subject subject = SecurityUtils.getSubject();
             User userLogin = userService.getUserLogin();//获取登录用户
             //admin用户只能结算自己团队的帖子
-            if(!subject.hasRole("superAdmin")){
+            /*if(!subject.hasRole("superAdmin")){
                 if(subject.hasRole("admin")){
                    //查询被奖励者团队id
                    User user = userService.queryUserById(id);
@@ -210,7 +199,7 @@ public class UserController {
                 }else{
                     return RespBean.error("奖励失败，您当前无权限奖励此用户。");
                 }
-            }
+            }*/
             //此id为用户id
             budgetLog.setUserId(id);
 

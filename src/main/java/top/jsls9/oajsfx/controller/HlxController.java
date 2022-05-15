@@ -130,6 +130,7 @@ public class HlxController {
         String principal = (String) subject.getPrincipal();
         //查询登录用户信息
         User user = userService.getUserByUserName(principal);
+        /*
         //获取帖子详情，这tm好耦合啊
         PostsJsonRootBean postDetails = HlxUtils.getPostDetails(postId);
         //判断用户权限，普通用户仅限结算自己的，管理员用户可以结算所属团队的，超级管理员结算不受限制； TODO 单独抽出来做验证，以后也许会用到其他地方
@@ -146,7 +147,7 @@ public class HlxController {
                     return RespBean.error("结算失败，当前无权限结算此贴。");
                 }
             }
-        }
+        }*/
         //结算
         RespBean settlement = (RespBean) hlxService.settlement(user.getHlxUserId(), postId, type);
         System.out.println(principal);

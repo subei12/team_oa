@@ -50,6 +50,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Map<String, Object> queryUsersByPageAndUser(Integer pageNum, Integer pageSize, User user) {
+        Subject subject = SecurityUtils.getSubject();
+        if(!subject.hasRole("superAdmin")){
+            User userLogin = getUserLogin();//暂时改成只能查询当前登录用户所在部门(超级管理员除外)  TODO（还没有改成多级部门）
+            user.setDeptId(userLogin.getDeptId());
+            if(StringUtils.isNotBlank(user.getDeptId())){
+                return null;
+            }
+        }
         PageHelper.startPage(pageNum,pageSize);
         List<User> users = userDao.queryUsers(user);
         PageInfo<User> pageInfo = new PageInfo<User>(users);
