@@ -1,12 +1,11 @@
-package top.jsls9.oajsfx.model;
+package top.jsls9.oajsfx.vo;
 
-import java.io.Serializable;
-
-/**
- * role
- * @author 
+/**懒得建个dto的包了
+ * @author bSu
+ * @date 2022/5/8 - 15:28
  */
-public class Role implements Serializable {
+public class RoleDTO {
+
     private String id;
 
     /**
@@ -29,7 +28,10 @@ public class Role implements Serializable {
      */
     private Integer level;
 
-    private static final long serialVersionUID = 1L;
+    /**
+     * 权限id，多个以“,”分割
+     */
+    private String permissionId;
 
     public String getId() {
         return id;
@@ -69,5 +71,13 @@ public class Role implements Serializable {
 
     public void setLevel(Integer level) {
         this.level = level;
+    }
+
+    public String getPermissionId() {
+        return permissionId;
+    }
+
+    public void setPermissionId(String permissionId) {
+        this.permissionId = permissionId;
     }
 }

@@ -70,8 +70,8 @@ public class UserController {
     public Object addUser(@RequestBody User user){
         try {
             //对用户名进行校验，用户名必须唯一
-            int count = userService.getCountByUserName(user.getUsername());
-            if(count!=0){
+            int count = userService.getCountByUserName(user.getQq());//默认使用qq作为用户名
+            if(count != 0){
                 return RespBean.error("用户名已存在，请重试");
             }
             if(user.getHlxUserId().length()>10 || user.getQq().length()>11 ){
@@ -163,9 +163,9 @@ public class UserController {
         return RespBean.success("查询成功",user);
     }
 
-    /* 重构角色、权限管理
+    // 重构角色、权限管理
     @ApiOperation("给用户赋予角色")
-    @RequiresRoles(value = {"superAdmin"},logical = Logical.OR)
+    //@RequiresRoles(value = {"superAdmin"},logical = Logical.OR)
     @PutMapping("/user/role/{id}")
     public Object updateUserRoleByUserId(@PathVariable("id") String id,@RequestBody Map<String,String> map){
         try {
@@ -174,22 +174,14 @@ public class UserController {
             userRoleService.deleteByUserId(id);
             User u = new User();
             if (StringUtils.isNotBlank(roles)){
-                //如果checkboxes不为空，就代表此用户被赋予角色
-                String[] roleIds = roles.split(",");
-                //给用户赋予权限
-                for(String roleId : roleIds){
-                    UserRole userRole = new UserRole();
-                    userRole.setRoleId(roleId);
-                    userRole.setUserId(id);
-                    userRoleService.insert(userRole);
-                }
+                userService.giveRoleByRolesAndUserId(roles, id);
             }
             return RespBean.success("角色赋予成功",null);
         }catch (Exception e){
             e.printStackTrace();
             return RespBean.error("操作，我联系我自己",e.getMessage());
         }
-    }*/
+    }
 
     @ApiOperation("自定义发放奖励")
     //@RequiresRoles(value = {"superAdmin","admin"},logical = Logical.OR)

@@ -203,10 +203,49 @@
     </if>
   </select>
 
+
   <update id="deleteById">
     update permission
     set `status` = 1
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+  <resultMap id="PermissionInputTreeMap" type="top.jsls9.oajsfx.vo.PermissionInputTreeVo">
+    <id column="id" jdbcType="VARCHAR" property="value" />
+    <result column="name" jdbcType="VARCHAR" property="label" />
+    <result column="parent_id" jdbcType="INTEGER" property="parentId" />
+  </resultMap>
+
+  <select id="queryListForInputTreeByPId" resultMap="PermissionInputTreeMap">
+    select
+        <include refid="Base_Column_List" />
+    from permission p
+    where status = 0
+    <if test="parentId == null">
+      and parent_id is null
+    </if>
+    <if test="parentId != null">
+      and parent_id=#{parentId}
+    </if>
+  </select>
+  <select id="queryPermissionByUserId" resultMap="PermissionInputTreeMap">
+    select p.id, p.name, p.description, p.url, p.perms, p.parent_id, p.type, p.order_num, p.icon, p.status, p.create_time, p.update_time from permission p
+    left join role_permission rp on p.id = rp.permission_id
+    left join role r on rp.role_id = r.id
+    left join user_role ur on r.id = ur.role_id
+    left join user u on ur.user_id = u.id
+    where u.id = #{userId,jdbcType=VARCHAR}
+    and p.status = '0'
+    order by p.order_num
+  </select>
+  <select id="queryPermissionByRoleId" resultMap="PermissionInputTreeMap">
+      select p.id, p.name, p.description, p.url, p.perms, p.parent_id, p.type, p.order_num, p.icon, p.status, p.create_time, p.update_time from permission p
+      left join role_permission rp on p.id = rp.permission_id
+      left join role r on rp.role_id = r.id
+      where r.id = #{roleId,jdbcType=VARCHAR}
+      and p.status = '0'
+      order by p.order_num
+  </select>
 
 </mapper>

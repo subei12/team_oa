@@ -53,4 +53,5 @@ public interface UserService {
      */
     void updateUserRewardByUserId(BudgetLog budgetLog) throws IOException;
 
+    void giveRoleByRolesAndUserId(String roles, String id);
 }

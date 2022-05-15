@@ -52,7 +52,7 @@ public class UserRealm extends AuthorizingRealm {
             info.addStringPermission(p.getPerms());
         }
 
-        List<Role> roles = roleDao.queryRoleByUserName(userLogin.getUsername());
+        List<Role> roles = roleDao.getRoleByUserId(userLogin.getId());
         //移除所有的null元素
         roles.removeAll(Collections.singleton(null));
         //授权

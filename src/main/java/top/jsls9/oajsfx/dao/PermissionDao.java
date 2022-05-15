@@ -3,6 +3,7 @@ package top.jsls9.oajsfx.dao;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 import top.jsls9.oajsfx.model.Permission;
+import top.jsls9.oajsfx.vo.PermissionInputTreeVo;
 
 import java.util.List;
 
@@ -34,4 +35,10 @@ public interface PermissionDao {
     List<Permission> queryListByPId(Permission p);
 
     int deleteById(Integer id);
+
+    List<PermissionInputTreeVo> queryListForInputTreeByPId(PermissionInputTreeVo permission);
+
+    List<PermissionInputTreeVo> queryPermissionByUserId(String userId);
+
+    List<PermissionInputTreeVo> queryPermissionByRoleId(String roleId);
 }

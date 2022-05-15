@@ -10,14 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import top.jsls9.oajsfx.dao.BudgetLogDao;
-import top.jsls9.oajsfx.dao.DeptDao;
-import top.jsls9.oajsfx.dao.RoleDao;
-import top.jsls9.oajsfx.dao.UserDao;
-import top.jsls9.oajsfx.model.BudgetLog;
-import top.jsls9.oajsfx.model.Dept;
-import top.jsls9.oajsfx.model.Role;
-import top.jsls9.oajsfx.model.User;
+import top.jsls9.oajsfx.dao.*;
+import top.jsls9.oajsfx.model.*;
 import top.jsls9.oajsfx.service.UserService;
 import top.jsls9.oajsfx.utils.HlxUtils;
 
@@ -46,6 +40,9 @@ public class UserServiceImpl implements UserService {
     private DeptDao deptDao;
 
     @Autowired
+    private UserRoleDao userRoleDao;
+
+    @Autowired
     private BudgetLogDao budgetLogDao;
 
     @Autowired
@@ -60,7 +57,7 @@ public class UserServiceImpl implements UserService {
         List<User> list = pageInfo.getList();
         for (User u : list){
             //获取到角色名
-            List<Role> roles = roleDao.queryRoleByUserName(u.getUsername());
+            List<Role> roles = roleDao.getRoleByUserId(u.getId());
             //移除所有的null元素
             roles.removeAll(Collections.singleton(null));
             StringBuffer stringBuffer = new StringBuffer();
@@ -88,7 +85,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int insetUser(User user) {
-        return userDao.insertSelective(user);
+        int i = userDao.insertSelective(user);
+        if(i <= 0){
+            return 0;
+        }
+        //插入时默认赋予普通用户权限
+        Role role = roleDao.selectByPrimaryKey("e9b7762a-d38d-11ec-8189-00163e0cb384");//先写死吧，以后换数据字典
+        UserRole userRole = new UserRole();
+        userRole.setRoleId(role.getId());
+        userRole.setUserId(user.getId());
+        userRoleDao.insert(userRole);
+        return i;
     }
 
     @Override
@@ -188,6 +195,38 @@ public class UserServiceImpl implements UserService {
         //插入修改日志
         budgetLogDao.insert(budgetLog);
 
+    }
+
+    /**
+     * 给用户赋予角色
+     * @param roles
+     * @param id
+     */
+    @Override
+    public void giveRoleByRolesAndUserId(String roles, String id) {
+        User userLogin = getUserLogin();
+        //如果checkboxes不为空，就代表此用户被赋予角色
+        String[] roleIds = roles.split(",");
+        //给用户赋予角色
+        for(String roleId : roleIds){
+            //查询角色等级，等级数字越大权限越小；即当前操作人的最高角色等级要小于要赋予的角色
+            String topLevelByUserId = roleDao.getRoleTopLevelByUserId(userLogin.getId());
+            Role role = roleDao.selectByPrimaryKey(roleId);
+            if(StringUtils.isBlank(topLevelByUserId)){
+                break;
+            }
+            if(role == null){
+                continue;
+            }
+            if(Integer.valueOf(topLevelByUserId) >= role.getLevel()){
+                //操作用户的最高等级比当前角色的等级大或者等，表示没有此角色权限
+                continue;
+            }
+            UserRole userRole = new UserRole();
+            userRole.setRoleId(roleId);
+            userRole.setUserId(id);
+            userRoleDao.insert(userRole);
+        }
     }
 
 }

@@ -5,21 +5,25 @@
     <id column="id" jdbcType="VARCHAR" property="id" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="level" jdbcType="INTEGER" property="level" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, `name`, description
+    id, `name`, description, `status`, `level`
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from role
     where id = #{id,jdbcType=VARCHAR}
+    and status = 0
   </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from role
     where id = #{id,jdbcType=VARCHAR}
   </delete>
+
   <insert id="insert" keyColumn="id" keyProperty="id" parameterType="top.jsls9.oajsfx.model.Role" useGeneratedKeys="true">
     insert into role (`name`, description)
     values (#{name,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR})
@@ -43,6 +47,7 @@
       </if>
     </trim>
   </insert>
+
   <update id="updateByPrimaryKeySelective" parameterType="top.jsls9.oajsfx.model.Role">
     update role
     <set>
@@ -58,7 +63,8 @@
   <update id="updateByPrimaryKey" parameterType="top.jsls9.oajsfx.model.Role">
     update role
     set `name` = #{name,jdbcType=VARCHAR},
-      description = #{description,jdbcType=VARCHAR}
+      description = #{description,jdbcType=VARCHAR},
+      level = #{level,jdbcType=INTEGER}
     where id = #{id,jdbcType=VARCHAR}
   </update>
 
@@ -66,10 +72,56 @@
         select r.id, r.name, r.description from user u
         left join user_role us on u.id = us.user_id
         left join role r on us.role_id = r.id
-        where u.username=#{userName} and u.state = 0
+        where u.username=#{userName} and u.state = 0 and r.status = 0
   </select>
   <select id="getRoleList" resultType="top.jsls9.oajsfx.model.Role">
-        select id, name, description from role
+        select id, name, description, status, level  from role
+        where status = 0 order by level asc
+  </select>
+
+
+  <insert id="addRole" keyColumn="id" parameterType="top.jsls9.oajsfx.model.Role">
+    <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.String">
+      SELECT uuid()
+    </selectKey>
+    insert into role (id,`name`, description, `status`, `level`)
+    values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 0, #{level,jdbcType=INTEGER})
+  </insert>
+
+  <!-- 逻辑删 -->
+  <update id="delRoleById" parameterType="top.jsls9.oajsfx.model.Role">
+    update role
+    set `status` = 1
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
+  <select id="getRoleByUserId" resultMap="BaseResultMap">
+    select
+    r.id,r.name, r.description, r.status, r.level
+    from role r
+    left join user_role ur on r.id = ur.role_id
+    left join user u on ur.user_id = u.id
+    where u.id = #{userId, jdbcType=VARCHAR}
+    and u.state = 0
+    and r.status = 0
+  </select>
+
+  <select id="getRoleTopLevelByUserId" resultType="java.lang.String">
+    select distinct r.level from role r
+    left join user_role ur on r.id = ur.role_id
+    left join user u on ur.user_id = u.id
+    where u.id = #{userId, jdbcType=VARCHAR}
+      and u.state = 0
+      and r.status = 0
+  </select>
+
+  <select id="getRoleListByRoleLevel" resultMap="BaseResultMap">
+    select distinct <include refid="Base_Column_List" />
+    from role r
+    where r.status = 0
+     <![CDATA[
+        AND r.level > #{topLevelByUserId, jdbcType=VARCHAR}
+      ]]>
   </select>
 
 </mapper>

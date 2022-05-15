@@ -5,9 +5,10 @@ import org.springframework.stereotype.Service;
 import top.jsls9.oajsfx.dao.PermissionDao;
 import top.jsls9.oajsfx.model.Permission;
 import top.jsls9.oajsfx.service.PermissionService;
+import top.jsls9.oajsfx.vo.PermissionInputTreeVo;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author bSu
@@ -68,6 +69,30 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public int addPermission(Permission p) {
         return permissionDao.insert(p);
+    }
+
+    @Override
+    public List<PermissionInputTreeVo> selectAllByForInputTree(PermissionInputTreeVo permission) {
+        List<PermissionInputTreeVo> permissions =permissionDao.queryListForInputTreeByPId(permission);
+        if (permissions.size()>0){
+            PermissionInputTreeVo permission1 = new PermissionInputTreeVo();
+            for (int i = 0; i <permissions.size() ; i++) {
+                permission1.setParentId( Integer.valueOf(permissions.get(i).getValue()) );
+                List<PermissionInputTreeVo> list = selectAllByForInputTree(permission1);
+                permissions.get(i).setChildren(list);
+            }
+        }
+        return permissions;
+    }
+
+    @Override
+    public List<PermissionInputTreeVo> queryPermissionByUserId(String userId) {
+        return permissionDao.queryPermissionByUserId(userId);
+    }
+
+    @Override
+    public List<PermissionInputTreeVo> queryPermissionByRoleId(String roleId) {
+        return permissionDao.queryPermissionByRoleId(roleId);
     }
 
 

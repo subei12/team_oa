@@ -18,4 +18,11 @@ public interface RolePermissionDao {
     int updateByPrimaryKeySelective(RolePermission record);
 
     int updateByPrimaryKey(RolePermission record);
+
+    /**
+     * 根据角色id删除角色与权限的关系
+     * @param rId
+     * @return
+     */
+    int deleteByrId(String rId);
 }

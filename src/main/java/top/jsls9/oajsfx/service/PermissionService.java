@@ -1,9 +1,9 @@
 package top.jsls9.oajsfx.service;
 
 import top.jsls9.oajsfx.model.Permission;
+import top.jsls9.oajsfx.vo.PermissionInputTreeVo;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author bSu
@@ -43,4 +43,10 @@ public interface PermissionService {
     int delPermissionById(Integer id);
 
     int addPermission(Permission p);
+
+    List<PermissionInputTreeVo> selectAllByForInputTree(PermissionInputTreeVo b);
+
+    List<PermissionInputTreeVo> queryPermissionByUserId(String userId);
+
+    List<PermissionInputTreeVo> queryPermissionByRoleId(String roleId);
 }

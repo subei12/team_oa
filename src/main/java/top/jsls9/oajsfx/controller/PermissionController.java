@@ -2,13 +2,16 @@ package top.jsls9.oajsfx.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import top.jsls9.oajsfx.model.Permission;
 import top.jsls9.oajsfx.service.PermissionService;
+import top.jsls9.oajsfx.service.UserService;
 import top.jsls9.oajsfx.utils.RespBean;
+import top.jsls9.oajsfx.vo.PermissionInputTreeVo;
 
 import javax.jnlp.PersistenceService;
 import java.util.HashMap;
@@ -27,6 +30,9 @@ public class PermissionController {
 
     @Autowired
     private PermissionService permissionService;
+
+    @Autowired
+    private UserService userService;
 
     /**
      * 查询所有权限配置
@@ -99,6 +105,50 @@ public class PermissionController {
         }
         return RespBean.error("新增失败");
     }
+
+
+    /**
+     * 查询所有权限配置-以适配amis InputTree
+     * 本接口用作为角色提供可选得权限配置
+     * @param roleId 如果这个参数有值，带出这个角色得权限
+     * @return
+     */
+    @ApiOperation("查询所有权限配置-InputTree")
+    @GetMapping("/permissionsInputTree")
+    public RespBean permissionsInputTree(String roleId){
+        try {
+            List<PermissionInputTreeVo> permissionInputTreeVos = permissionService.selectAllByForInputTree(new PermissionInputTreeVo());
+            /*Map<String, Object> map = new HashMap<>();
+            map.put("count",1);
+            map.put("rows",permissionInputTreeVos);*/
+            //淦，原来不按照amis的例子返回也能正常显示
+            /* 这个写法可用配合前端自动勾选，value是不需要子节点的，直接[{}]就行，通过对象得value区分
+            {
+              "type": "input-tree",
+              "name": "tree",
+              "label": "分配权限",
+              "multiple": true,
+              "cascade": true,
+              "options": [],
+              "value": [],
+              "source": "get:/api/permissionsInputTree"
+            },
+            */
+            Map<String, Object> map = new HashMap<>();
+            map.put("options",permissionInputTreeVos);
+            if(StringUtils.isNotBlank(roleId)){
+                List<PermissionInputTreeVo> list =  permissionService.queryPermissionByRoleId(roleId);
+                map.put("value", list);
+            }
+            return RespBean.success("查询成功",map);
+        }catch (Exception e){
+            logger.error("查询失败",e.getMessage());
+            e.printStackTrace();
+            return RespBean.error("查询失败");
+        }
+    }
+
+
 
 
 }

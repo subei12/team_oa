@@ -24,4 +24,24 @@ public interface RoleDao {
     List<Role> queryRoleByUserName(String userName);
 
     List<Role> getRoleList();
+
+    /**
+     * 返回的是插入的条数，并把生成id赋值给role对象
+     * @param role
+     * @return
+     */
+    int addRole(Role role);
+
+    int delRoleById(String id);
+
+    List<Role> getRoleByUserId(String userId);
+
+    String getRoleTopLevelByUserId(String userId);
+
+    /**
+     * 查询低于此角色等级的角色
+     * @param topLevelByUserId
+     * @return
+     */
+    List<Role> getRoleListByRoleLevel(String topLevelByUserId);
 }

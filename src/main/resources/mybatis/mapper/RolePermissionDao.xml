@@ -60,4 +60,9 @@
       permission_id = #{permissionId,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <delete id="deleteByrId">
+    delete from role_permission
+    where role_id = #{rId,jdbcType=VARCHAR}
+  </delete>
 </mapper>

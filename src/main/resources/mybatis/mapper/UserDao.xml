@@ -52,6 +52,9 @@
       #{username,jdbcType=VARCHAR}, 0)
   </insert>
   <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="top.jsls9.oajsfx.model.User" useGeneratedKeys="true">
+    <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.String">
+      SELECT uuid()
+    </selectKey>
     insert into user
     <trim prefix="(" suffix=")" suffixOverrides=",">
         id,
@@ -87,7 +90,7 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-        uuid(),
+      #{id},
       <if test="username != null">
         #{username,jdbcType=VARCHAR},
       </if>
@@ -156,7 +159,7 @@
         select id, username, create_time, state from user where state=0
   </select>
   <select id="getCountByUserName" resultType="java.lang.Integer">
-        select count(1) from user where username = #{userName,jdbcType=VARCHAR}
+        select count(1) from user where username = #{userName,jdbcType=VARCHAR} and state=0
   </select>
 
     <select id="getUserCount" resultType="java.lang.Integer">
