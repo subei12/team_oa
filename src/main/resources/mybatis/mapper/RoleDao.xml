@@ -107,7 +107,7 @@
   </select>
 
   <select id="getRoleTopLevelByUserId" resultType="java.lang.String">
-    select distinct r.level from role r
+    select distinct min(r.level) from role r
     left join user_role ur on r.id = ur.role_id
     left join user u on ur.user_id = u.id
     where u.id = #{userId, jdbcType=VARCHAR}
