@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
         if(!subject.hasRole("superAdmin")){
             User userLogin = getUserLogin();//暂时改成只能查询当前登录用户所在部门(超级管理员除外)  TODO（还没有改成多级部门）
             user.setDeptId(userLogin.getDeptId());
-            if(StringUtils.isNotBlank(user.getDeptId())){
+            if(StringUtils.isBlank(user.getDeptId())){
                 return null;
             }
         }
@@ -207,22 +207,30 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 给用户赋予角色
-     * @param roles
-     * @param id
+     * @param roles 角色ids
+     * @param id 被操作用户id
      */
     @Override
     public void giveRoleByRolesAndUserId(String roles, String id) {
         User userLogin = getUserLogin();
+        //查询角色等级，等级数字越大权限越小；即当前操作人的最高角色等级要小于要赋予的角色
+        String topLevelByUserId = roleDao.getRoleTopLevelByUserId(userLogin.getId());
+        if(StringUtils.isBlank(topLevelByUserId)){
+            return;
+        }
+        List<Role> roleByUserId = roleDao.getRoleByUserId(id);
+        //先删除当前用户的所有角色，比当前用户最高权限数字大的才可以被删除。
+        for(Role r : roleByUserId){
+            if(Integer.valueOf(topLevelByUserId) >= r.getLevel()){
+                continue;
+            }
+            userRoleDao.deleteByUserIdAndRId(id, r.getId());
+        }
         //如果checkboxes不为空，就代表此用户被赋予角色
         String[] roleIds = roles.split(",");
         //给用户赋予角色
         for(String roleId : roleIds){
-            //查询角色等级，等级数字越大权限越小；即当前操作人的最高角色等级要小于要赋予的角色
-            String topLevelByUserId = roleDao.getRoleTopLevelByUserId(userLogin.getId());
             Role role = roleDao.selectByPrimaryKey(roleId);
-            if(StringUtils.isBlank(topLevelByUserId)){
-                break;
-            }
             if(role == null){
                 continue;
             }

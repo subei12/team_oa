@@ -1,6 +1,7 @@
 package top.jsls9.oajsfx.dao;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 import top.jsls9.oajsfx.model.UserRole;
 
@@ -21,4 +22,5 @@ public interface UserRoleDao {
 
     void deleteByUserId(String id);
 
+    void deleteByUserIdAndRId(@Param("id") String id, @Param("rId") String id1);
 }

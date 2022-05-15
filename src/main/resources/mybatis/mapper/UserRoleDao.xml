@@ -79,4 +79,9 @@
     delete from user_role
     where user_id = #{id,jdbcType=VARCHAR}
   </delete>
+  <delete id="deleteByUserIdAndRId">
+    delete from user_role
+    where user_id = #{id,jdbcType=VARCHAR}
+    and role_id = #{rId,jdbcType=VARCHAR}
+  </delete>
 </mapper>

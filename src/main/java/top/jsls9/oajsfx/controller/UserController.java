@@ -159,8 +159,6 @@ public class UserController {
     public Object updateUserRoleByUserId(@PathVariable("id") String id,@RequestBody Map<String,String> map){
         try {
             String roles = map.get("roles");
-            //先删除当前用户的所有角色
-            userRoleService.deleteByUserId(id);
             User u = new User();
             if (StringUtils.isNotBlank(roles)){
                 userService.giveRoleByRolesAndUserId(roles, id);
@@ -168,7 +166,7 @@ public class UserController {
             return RespBean.success("角色赋予成功",null);
         }catch (Exception e){
             e.printStackTrace();
-            return RespBean.error("操作，我联系我自己",e.getMessage());
+            return RespBean.error("操作失败，请联系系统管理员。",e.getMessage());
         }
     }
 
