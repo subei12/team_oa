@@ -160,9 +160,7 @@ public class UserController {
         try {
             String roles = map.get("roles");
             User u = new User();
-            if (StringUtils.isNotBlank(roles)){
-                userService.giveRoleByRolesAndUserId(roles, id);
-            }
+            userService.giveRoleByRolesAndUserId(roles, id);
             return RespBean.success("角色赋予成功",null);
         }catch (Exception e){
             e.printStackTrace();
