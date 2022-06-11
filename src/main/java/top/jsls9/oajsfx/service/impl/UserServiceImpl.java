@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import top.jsls9.oajsfx.dao.*;
+import top.jsls9.oajsfx.enums.SysSourceLogType;
 import top.jsls9.oajsfx.model.*;
 import top.jsls9.oajsfx.service.UserService;
 import top.jsls9.oajsfx.utils.HlxUtils;
@@ -47,6 +48,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private HlxUtils hlxUtils;
+
+    @Autowired
+    private SysSourceLogDao sysSourceLogDao;
 
     @Override
     public Map<String, Object> queryUsersByPageAndUser(Integer pageNum, Integer pageSize, User user) {
@@ -202,6 +206,8 @@ public class UserServiceImpl implements UserService {
         deptDao.updateNameById(dept);
         //插入修改日志
         budgetLogDao.insert(budgetLog);
+        //全局（各种不同赠送类型的汇总）日志
+        sysSourceLogDao.insertLog(user.getHlxUserId(), budgetLog.getSource(), SysSourceLogType.TYPE3.getValue());
 
     }
 

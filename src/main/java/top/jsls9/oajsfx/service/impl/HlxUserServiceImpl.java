@@ -7,11 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import top.jsls9.oajsfx.dao.DeptDao;
-import top.jsls9.oajsfx.dao.PostLogDao;
-import top.jsls9.oajsfx.dao.PostLogicDao;
-import top.jsls9.oajsfx.dao.SendScoreLogDao;
+import top.jsls9.oajsfx.dao.*;
 import top.jsls9.oajsfx.enums.PostLogicVariable;
+import top.jsls9.oajsfx.enums.SysSourceLogType;
 import top.jsls9.oajsfx.hlxPojo.Post;
 import top.jsls9.oajsfx.hlxPojo.Posts;
 import top.jsls9.oajsfx.hlxPojo.PostsJsonRootBean;
@@ -53,6 +51,9 @@ public class HlxUserServiceImpl implements HlxService {
     private PostLogicDao postLogicDao;
     @Autowired
     private DeptDao deptDao;
+
+    @Autowired
+    private SysSourceLogDao sysSourceLogDao;
 
     private static final String SUCCESS = "success";
 
@@ -245,6 +246,8 @@ public class HlxUserServiceImpl implements HlxService {
                     sendScoreLog.setSourceNumber(source);
                     //葫芦赠送日志
                     sendScoreLogDao.insert(sendScoreLog);
+                    //全局（各种不同赠送类型的汇总）日志
+                    sysSourceLogDao.insertLog(user.getHlxUserId(), source, SysSourceLogType.TYPE1.getValue());
                     break;
                 case 1://结算到楼主oa账户上
                     user.setGourd(source);

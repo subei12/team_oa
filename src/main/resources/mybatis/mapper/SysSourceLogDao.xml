@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.jsls9.oajsfx.dao.SysSourceLogDao">
+  <resultMap id="BaseResultMap" type="top.jsls9.oajsfx.model.SysSourceLog">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="hlx_user_id" jdbcType="VARCHAR" property="hlxUserId" />
+    <result column="source" jdbcType="INTEGER" property="source" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="create_user_id" jdbcType="VARCHAR" property="createUserId" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, hlx_user_id, `source`, `type`, create_user_id, create_date
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sys_source_log
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from sys_source_log
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="top.jsls9.oajsfx.model.SysSourceLog" useGeneratedKeys="true">
+    insert into sys_source_log (hlx_user_id, `source`, `type`, 
+      create_user_id, create_date)
+    values (#{hlxUserId,jdbcType=VARCHAR}, #{source,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, 
+      #{createUserId,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="top.jsls9.oajsfx.model.SysSourceLog" useGeneratedKeys="true">
+    insert into sys_source_log
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="hlxUserId != null">
+        hlx_user_id,
+      </if>
+      <if test="source != null">
+        `source`,
+      </if>
+      <if test="type != null">
+        `type`,
+      </if>
+      <if test="createUserId != null">
+        create_user_id,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="hlxUserId != null">
+        #{hlxUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="source != null">
+        #{source,jdbcType=INTEGER},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="createUserId != null">
+        #{createUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="top.jsls9.oajsfx.model.SysSourceLog">
+    update sys_source_log
+    <set>
+      <if test="hlxUserId != null">
+        hlx_user_id = #{hlxUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="source != null">
+        `source` = #{source,jdbcType=INTEGER},
+      </if>
+      <if test="type != null">
+        `type` = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="createUserId != null">
+        create_user_id = #{createUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="top.jsls9.oajsfx.model.SysSourceLog">
+    update sys_source_log
+    set hlx_user_id = #{hlxUserId,jdbcType=VARCHAR},
+      `source` = #{source,jdbcType=INTEGER},
+      `type` = #{type,jdbcType=INTEGER},
+      create_user_id = #{createUserId,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <insert id="insertLog">
+    insert into sys_source_log (hlx_user_id, `source`, `type`,
+       create_date)
+    values (#{hlxUserId,jdbcType=VARCHAR}, #{number,jdbcType=INTEGER}, #{type,jdbcType=INTEGER},
+       sysdate())
+  </insert>
+</mapper>
