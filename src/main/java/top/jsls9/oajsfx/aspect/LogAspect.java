@@ -144,8 +144,8 @@ public class LogAspect {
 
         sysLogService.saveSysLog(sysLog);
 
-        logger.info("存入数据 ------ {}",sysLog );
-        logger.info("返回数据 ------ {}",result );
+        logger.info("存入数据 ------ {}", JSON.toJSONString(sysLog));
+        logger.info("返回数据 ------ {}", JSON.toJSONString(result));
 
 
     }

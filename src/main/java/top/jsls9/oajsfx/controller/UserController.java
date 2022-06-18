@@ -218,4 +218,24 @@ public class UserController {
         return RespBean.success("查询成功",user);
     }
 
+    /**
+     * 提现OA账户内得剩余葫芦，获得葫芦的id可自定义（错了不退）。
+     * @param id    提现到得葫芦侠id
+     * @param count 提现得数量
+     * @return
+     * @throws IOException
+     */
+    @ApiOperation("OA账户剩余葫芦提现")
+    @PostMapping("/user/gourd/withdrawal/{id}/{count}")
+    public RespBean withdrawal(@PathVariable("id") String id, @PathVariable("count") Integer count) throws IOException {
+        if(StringUtils.isBlank(id) || count <= 0){
+            return RespBean.error("参数异常，请检查后重试");
+        }
+        String result = userService.withdrawal(id, count);
+        if(StringUtils.isNotBlank(result)){
+            return RespBean.error(result);
+        }
+        return RespBean.success("提取成功");
+    }
+
 }

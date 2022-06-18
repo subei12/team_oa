@@ -251,4 +251,25 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public synchronized String withdrawal(String hlxuserId, Integer count) throws IOException {
+        //查询本账号剩余葫芦
+        User userLogin = getUserLogin();
+        User user = userDao.selectByPrimaryKey(userLogin.getId());
+        //判断剩余葫芦是否够本次提现
+        if(user.getGourd() < count){
+            return "账户剩余葫芦不足，请刷新/检查后重试。";
+        }
+        //扣除葫芦
+        user.setGourd(  -count );
+        userDao.updateGourdByHlxUserId(user);
+        //赠送葫芦
+        String commentId = HlxUtils.getNewCommentId(hlxuserId);//最新的回复id
+        hlxUtils.sendSorcePlus("2", commentId, "OA账户余额提取", String.valueOf(count));
+        //统计全局日志
+        sysSourceLogDao.insertLog(user.getHlxUserId(), count, SysSourceLogType.TYPE2.getValue());
+        return null;
+    }
+
 }

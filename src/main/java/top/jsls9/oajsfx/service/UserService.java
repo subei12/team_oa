@@ -54,4 +54,13 @@ public interface UserService {
     void updateUserRewardByUserId(BudgetLog budgetLog) throws IOException;
 
     void giveRoleByRolesAndUserId(String roles, String id);
+
+    /**
+     *
+     * @param hlxUserId 社区用户id
+     * @param count 数量
+     * @return
+     * @throws IOException
+     */
+    String withdrawal(String hlxUserId, Integer count) throws IOException;
 }
