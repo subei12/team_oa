@@ -356,5 +356,63 @@ public class HlxUserServiceImpl implements HlxService {
     }
 
 
+    /**
+     *
+     * 只获取用户一个月内的第一个板块帖
+     * @param userId
+     * @return
+     * @throws IOException
+     * @throws ParseException
+     */
+    @Override
+    public Posts getPostsByUserIdQueryOne(String userId) throws IOException, ParseException {
+        String catId = "96";//96表示技术分享板块
+        //开始帖子，第一次为0
+        String start = "0";
+        //标记，是否继续循环
+        boolean flag = true;
+        Posts p = new Posts();
+        do{
+            String postJsonUrl="http://floor.huluxia.com/post/create/list/ANDROID/2.0?start="+start+"&count=20&user_id="+userId+"&_key="+hlxUtils.getKey();
+            Connection.Response response = HttpUtils.get(postJsonUrl);
+            String body = response.body();
+            JSONObject json=new JSONObject();
+            PostsJsonRootBean jsonRootBean = json.parseObject(response.body(), PostsJsonRootBean.class);
+            List<Posts> posts = jsonRootBean.getPosts();
+            //下一次查询开始的帖子id
+            start = jsonRootBean.getStart();
+            //只查询当月和上月的帖子
+            //获取当月和上月
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
+            Date date = new Date();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date); // 设置为当前时间
+            calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) - 1); // 设置为上一个月
+            date = calendar.getTime();
+
+            for(Posts post : posts){
+                //不是技术分享板块帖子，跳出循环
+                if(!String.valueOf(post.getCategory().getCategoryID()).equals(catId)){
+                    continue;
+                }
+                //只获取一个月内的帖子
+                if(date.getTime()<=post.getCreateTime()){
+                    p = post;
+                    return p;
+                }else{
+                    //不是一个月内的帖子，不再参与结算查询，如需结算需要自行抓包，本程序不提供服务（也不是懒，只是不想惯着长时间不结算的毛病）
+                    flag = false;
+                    break;
+                }
+            }
+            //小与20表示本次查询不满，即为已经没有帖子可以用于下次查询
+            if(posts.size()<20){
+                flag = false;
+            }
+        }while (flag);
+
+        return p;
+    }
+
 
 }

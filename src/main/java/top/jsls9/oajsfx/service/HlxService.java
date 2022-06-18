@@ -1,5 +1,8 @@
 package top.jsls9.oajsfx.service;
 
+import top.jsls9.oajsfx.hlxPojo.Post;
+import top.jsls9.oajsfx.hlxPojo.Posts;
+
 import java.io.IOException;
 import java.text.ParseException;
 
@@ -14,5 +17,8 @@ public interface HlxService {
 
     //查询
     Object getPostsByUserIdNew(String userId) throws IOException, ParseException;
+
+    //查询一个帖子
+    Posts getPostsByUserIdQueryOne(String userId) throws IOException, ParseException;
 
 }

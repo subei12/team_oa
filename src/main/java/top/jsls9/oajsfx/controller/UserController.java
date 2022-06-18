@@ -238,4 +238,19 @@ public class UserController {
         return RespBean.success("提取成功");
     }
 
+
+    //无效分页
+    @ApiOperation("查看各团队一个月内未发帖情况")
+    @GetMapping("/user/posSituationt")
+    public RespBean getUsersPosSituationtByDeptId(@RequestParam Integer page, @RequestParam Integer perPage, User user){
+        try {
+            return RespBean.success("查询成功",userService.getUsersPosSituationtByDeptId(page,perPage,user));
+        }catch (Exception e){
+            logger.error("查询失败",e.getMessage());
+            e.printStackTrace();
+            return RespBean.error("查询失败");
+        }
+    }
+
+
 }

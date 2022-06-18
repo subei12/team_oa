@@ -15,6 +15,7 @@ import top.jsls9.oajsfx.enums.SysSourceLogType;
 import top.jsls9.oajsfx.model.*;
 import top.jsls9.oajsfx.service.UserService;
 import top.jsls9.oajsfx.utils.HlxUtils;
+import top.jsls9.oajsfx.utils.RedisUtil;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -51,6 +52,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private SysSourceLogDao sysSourceLogDao;
+
+    @Autowired
+    private RedisUtil redisUtil;
 
     @Override
     public Map<String, Object> queryUsersByPageAndUser(Integer pageNum, Integer pageSize, User user) {
@@ -270,6 +274,30 @@ public class UserServiceImpl implements UserService {
         //统计全局日志
         sysSourceLogDao.insertLog(user.getHlxUserId(), count, SysSourceLogType.TYPE2.getValue());
         return null;
+    }
+
+    /**
+     * 查询各团队一个月内没发帖的人员
+     * 无效分页
+     * @param page
+     * @param perPage
+     * @param user
+     * @return
+     */
+    @Override
+    public Object getUsersPosSituationtByDeptId(Integer page, Integer perPage, User user) {
+
+        Subject subject = SecurityUtils.getSubject();
+        if(!subject.hasRole("superAdmin")){
+            User userLogin = getUserLogin();//暂时改成只能查询当前登录用户所在部门(超级管理员除外)  TODO（还没有改成多级部门）
+            user.setDeptId(userLogin.getDeptId());
+        }
+        if(StringUtils.isBlank(user.getDeptId())){
+            return null;
+        }
+
+        Object o = redisUtil.get(user.getDeptId());
+        return o;
     }
 
 }

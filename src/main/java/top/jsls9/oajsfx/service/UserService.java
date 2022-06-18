@@ -63,4 +63,6 @@ public interface UserService {
      * @throws IOException
      */
     String withdrawal(String hlxUserId, Integer count) throws IOException;
+
+    Object getUsersPosSituationtByDeptId(Integer page, Integer perPage, User user);
 }
