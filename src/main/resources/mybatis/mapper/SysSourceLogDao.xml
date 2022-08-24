@@ -103,4 +103,46 @@
     values (#{hlxUserId,jdbcType=VARCHAR}, #{number,jdbcType=INTEGER}, #{type,jdbcType=INTEGER},
        sysdate())
   </insert>
+
+  <select id="queryListSourceLog" resultMap="BaseResultMap">
+    select
+        <include refid="Base_Column_List" />
+    from sys_source_log
+    <where>
+      1 = 1
+      <if test="hlxUserId != null and hlxUserId != '' ">
+        AND hlx_user_id = #{hlxUserId}
+      </if>
+      <if test="type != null and type != 0">
+        AND type = #{type}
+      </if>
+      <if test="startDate != null and endDate != null">
+        <![CDATA[
+            AND date_format(create_date, '%Y-%c-%d') >= date_format(#{startDate}, '%Y-%c-%d') and date_format(create_date, '%Y-%c-%d') <= date_format(#{endDate}, '%Y-%c-%d')
+        ]]>
+      </if>
+    </where>
+    order by create_date
+  </select>
+  <select id="queryTotal" resultType="java.lang.Integer">
+      select
+        ifnull(sum(source), 0)
+      from sys_source_log
+      <where>
+        1 = 1
+        <if test="hlxUserId != null and hlxUserId != '' ">
+          AND hlx_user_id = #{hlxUserId}
+        </if>
+        <if test="type != null and type != 0">
+          AND type = #{type}
+        </if>
+        <if test="startDate != null and endDate != null">
+          <![CDATA[
+              AND date_format(create_date, '%Y-%c-%d') >= date_format(#{startDate}, '%Y-%c-%d') and date_format(create_date, '%Y-%c-%d') <= date_format(#{endDate}, '%Y-%c-%d')
+          ]]>
+        </if>
+        order by create_date
+      </where>
+  </select>
+
 </mapper>

@@ -4,6 +4,9 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 import top.jsls9.oajsfx.model.SysSourceLog;
+import top.jsls9.oajsfx.vo.SysSourceLogVo;
+
+import java.util.List;
 
 @Mapper
 @Repository
@@ -29,4 +32,18 @@ public interface SysSourceLogDao {
      */
     int insertLog(@Param("hlxUserId") String hlxUserId,@Param("number") int number,
                   @Param("type") int type);
+
+    /**
+     * 按条件查询奖励日志
+     * @param log
+     * @return
+     */
+    List<SysSourceLog> queryListSourceLog(SysSourceLogVo log);
+
+    /**
+     * 按条件查询总量
+     * @param vo
+     * @return
+     */
+    Integer queryTotal(SysSourceLogVo vo);
 }
