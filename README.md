@@ -8,6 +8,10 @@
 ### 技术栈
 springboot、shiro、mybatis等
 
+### 部署脚本
+- [sql脚本](/oa.sql)
+
+
 ### 前端
 使用百度开源项目：[AMIS](https://github.com/baidu/amis)
 
