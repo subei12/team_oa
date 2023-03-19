@@ -4,8 +4,7 @@ spring:
     username: team_oa
     password: 5FC8PcGitWnE5GkA
     #?serverTimezone=UTC解决时区的报错,我改了host所以是DB01，可以直接换成ip
-    url: jdbc:mysql://DB01/team_oa?serverTimezone=UTC
-    #url: jdbc:mysql://127.0.0.1/team_oa?serverTimezone=UTC
+    url: jdbc:mysql://DB01/team_oa?serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
 
@@ -79,7 +78,7 @@ hlx:
     userInfo: https://floor.huluxia.com/user/info/IOS/1.1
     #板块数据，包含三个维度的帖子列表
     #hlxCategoryData: https://floor.huluxia.com/home/post/list/IOS/1.1
-    hlxCategoryData: https://floor.huluxia.com/post/list/ANDROID/2.1
+    hlxCategoryData: https://floor.huluxia.com/post/list/ANDROID/4.1.8?market_id=floor_huluxia
 qq:
   url: http://send.frp.jsls9.top
   verifyKey: su123456
