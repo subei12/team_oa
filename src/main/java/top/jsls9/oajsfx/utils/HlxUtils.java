@@ -34,6 +34,9 @@ public class HlxUtils {
     @Value("${hlx.key.url}")
     private String getKeyUrl;
 
+    @Value("${hlx.key}")
+    private String key;
+
     @Value("${hlx.url.userInfo}")
     private String userInfoUrl;
 
@@ -42,17 +45,18 @@ public class HlxUtils {
      * @return
      */
     public String getKey(){
-        try {
-            String url=getKeyUrl;
-            Connection.Response response = HttpUtils.get(url);
-            String body = response.body();
-            JSONObject json=new JSONObject();
-            GetKeyRootBean getKeyRootBean = json.parseObject(response.body(), GetKeyRootBean.class);
-            return getKeyRootBean.get_key();
-        }catch (Exception e){
-            logger.error("获取key失败，",e);
-            return null;
-        }
+        return this.key;
+        // try {
+        //     String url=getKeyUrl;
+        //     Connection.Response response = HttpUtils.get(url);
+        //     String body = response.body();
+        //     JSONObject json=new JSONObject();
+        //     GetKeyRootBean getKeyRootBean = json.parseObject(response.body(), GetKeyRootBean.class);
+        //     return getKeyRootBean.get_key();
+        // }catch (Exception e){
+        //     logger.error("获取key失败，",e);
+        //     return null;
+        // }
     }
 
     /**
