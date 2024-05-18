@@ -9,9 +9,10 @@
     <result column="state" jdbcType="INTEGER" property="state" />
     <result column="source" jdbcType="INTEGER" property="source" />
     <result column="settlement_state" jdbcType="INTEGER" property="settlementState" />
+    <result column="dept_key" jdbcType="VARCHAR" property="deptKey" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, `name`, create_date, create_user_id, `state`, `source`, `settlement_state`
+    id, `name`, create_date, create_user_id, `state`, `source`, `settlement_state`, dept_key
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
@@ -87,6 +88,9 @@
       </if>
       <if test="state != null">
         `state` = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="deptKey != null">
+        dept_key = #{deptKey,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}

@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import top.jsls9.oajsfx.dao.DeptDao;
+import top.jsls9.oajsfx.dto.DeptUpdateDTO;
 import top.jsls9.oajsfx.model.BudgetLog;
 import top.jsls9.oajsfx.model.Dept;
 import top.jsls9.oajsfx.model.User;
@@ -108,6 +110,26 @@ public class DeptController {
         }catch (Exception e){
             logger.error("团队预算修改失败：",e);
             return RespBean.error("团队预算修改失败。");
+        }
+    }
+
+    @ApiOperation("团队奖励key配置")
+    @RequiresRoles(value = {"superAdmin"},logical = Logical.OR)
+    @PutMapping("/dept/key/{id}")
+    public RespBean updateDeptKey(@PathVariable("id") String id, @RequestBody DeptUpdateDTO dto){
+        try {
+            Dept dept = new Dept();
+            dept.setId(id);
+            dept.setDeptKey(dto.getKey());
+            if (StringUtils.isBlank(dto.getKey())) {
+                // 不传默认置空
+                dept.setDeptKey("");
+            }
+            deptService.updateDeptById(dept);
+            return RespBean.success("修改成功。");
+        }catch (Exception e){
+            logger.error("团队信息修改失败：",e);
+            return RespBean.error("修改失败。");
         }
     }
 

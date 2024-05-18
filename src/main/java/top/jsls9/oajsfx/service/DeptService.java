@@ -31,4 +31,11 @@ public interface DeptService {
 
     int delDeptById(String[] ids);
 
+    /**
+     * 通过 deptId 修改团队信息
+     * @param dept 团队id
+     * @return int
+     */
+    int updateDeptById(Dept dept);
+
 }

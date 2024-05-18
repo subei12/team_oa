@@ -187,20 +187,7 @@ public class UserServiceImpl implements UserService {
         //发放奖励
         String type = "2";//赠送到评论上
         String commentId = HlxUtils.getNewCommentId(user.getHlxUserId());//最新的回复id
-        if(budgetLog.getSource()<=200){
-            //小于200可以直接赠送
-            hlxUtils.sendSorce(type,commentId,budgetLog.getText(),String.valueOf(budgetLog.getSource()));
-            logger.info("用户："+budgetLog.getUserId()+"，一次性赠送完毕！");
-        }else {
-            for(int i=0;(budgetLog.getSource()/200)>i;i++){
-                hlxUtils.sendSorce(type,commentId,budgetLog.getText(),"200");
-                logger.info("用户："+budgetLog.getUserId()+"，第"+(i+1)+"次赠送200");
-            }
-            if(budgetLog.getSource()%200>0){
-                hlxUtils.sendSorce(type,commentId,budgetLog.getText(),String.valueOf(budgetLog.getSource()%200));
-                logger.info("用户："+budgetLog.getUserId()+"，剩下一次性赠送："+budgetLog.getSource()%200);
-            }
-        }
+        hlxUtils.sendSorcePlus(type,commentId,budgetLog.getText(),String.valueOf(budgetLog.getSource()), dept.getDeptKey());
         //扣除预算
         //数量要为负数，这里只用来奖励
         dept.setSource(-budgetLog.getSource());

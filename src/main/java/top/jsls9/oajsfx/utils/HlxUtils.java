@@ -179,6 +179,55 @@ public class HlxUtils {
 
     }
 
+    /** 指定赠送使用的key
+     * 赠送葫芦，不限数量（大于200会多次送）；
+     * 其他引用单次的就先不改了
+     * 赠送葫芦，type=2为评论，1为帖子，
+     * type为2时post_id填评论id
+     * @param type 2为评论，1为帖子
+     * @param postId type为2时post_id填评论id
+     * @param text 赠送回复文本
+     * @param sorce 赠送数量
+     * @param key 赠送使用的key, 为空使用系统配置key
+     * @throws IOException
+     */
+    public void sendSorcePlus(String type, String postId, String text, String sorce, String key) throws IOException,RuntimeException {
+        if(text.length()<5){
+            text=text+".....";
+        }
+        if (StringUtils.isBlank(key)) {
+            key = getKey();
+        }
+        String url="http://floor.huluxia.com/credits/transfer/ANDROID/2.0?platform=2&gkey=000000&app_version=4.0.0.1&versioncode=20141415&market_id=floor_web&_key="+key+"&device_code=%5Bw%5D02%3A00%3A00%3A00%3A00%3A00%5Bd%5D830b9382-7eef-4557-b585-afd28f674fe5";
+        Map<String, String> paramMap=new HashMap();
+        paramMap.put("post_id",postId);
+        paramMap.put("type_id",type);
+        paramMap.put("isadmin","0");
+        //paramMap.put("score",sorce);
+        paramMap.put("score_txt",text);
+        if(Integer.valueOf(sorce) <= 200){
+            //小于200可以直接赠送
+            paramMap.put("score", sorce);
+            Connection.Response post = HttpUtils.post(url, paramMap);
+            logger.info(post.body());
+            logger.info("type：{} 、postId：{}，一次性赠送{}完毕！", type, postId, sorce);
+        }else {
+            for(int i=0;(Integer.valueOf(sorce)/200)>i;i++){
+                paramMap.put("score", "200");
+                Connection.Response post = HttpUtils.post(url, paramMap);
+                logger.info(post.body());
+                logger.info("type：{} 、postId：{}，第"+(i+1)+"次赠送200", type, postId);
+            }
+            if(Integer.valueOf(sorce) %200 >0){
+                paramMap.put("score", String.valueOf( Integer.valueOf(sorce) %200 ));
+                Connection.Response post = HttpUtils.post(url, paramMap);
+                logger.info(post.body());
+                logger.info("type：{} 、postId：{}，剩下一次性赠送: {}", type, postId, Integer.valueOf(sorce)%200);
+            }
+        }
+
+    }
+
     /**
      * 获取一个用户的前count个帖子
      * @param count

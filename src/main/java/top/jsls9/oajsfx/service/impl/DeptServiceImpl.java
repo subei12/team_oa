@@ -53,4 +53,9 @@ public class DeptServiceImpl implements DeptService {
         return deptDao.getDepts();
     }
 
+    @Override
+    public int updateDeptById(Dept dept) {
+        return deptDao.updateByPrimaryKeySelective(dept);
+    }
+
 }

@@ -43,6 +43,12 @@ public class Dept implements Serializable {
      */
     private Integer settlementState;
 
+    /**
+     * 各团队分别配置奖励用的key,
+     * 如果没有配置默认使用系统配置的
+     */
+    private String deptKey;
+
     private static final long serialVersionUID = 1L;
 
     public Dept(String id, String name, Date createDate, String createUserId, Integer state,Integer source,Integer settlementState) {
@@ -116,6 +122,14 @@ public class Dept implements Serializable {
 
     public Integer getSettlementState() {
         return settlementState;
+    }
+
+    public String getDeptKey() {
+        return deptKey;
+    }
+
+    public void setDeptKey(String deptKey) {
+        this.deptKey = deptKey;
     }
 
     @Override
