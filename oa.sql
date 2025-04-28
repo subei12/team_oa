@@ -594,7 +594,7 @@ INSERT INTO team_oa.role_permission (id, role_id, permission_id) VALUES (456, '1
 INSERT INTO team_oa.role_permission (id, role_id, permission_id) VALUES (457, '1990013d-d42c-11ec-8189-00163e0cb384', '47');
 
 
-INSERT INTO team_oa.user (id, username, password, create_time, salt, state, last_time, update_time, qq, hlx_user_nick, hlx_user_id, dept_id, integral, gourd) VALUES ('fa50e3d147e810945b18e384d40a4ca6', 'superAdmin', 'c47666b6d82ec2c9f9a717673f750703', '2021-03-16 22:37:13', 'superAdmin', 0, null, '2021-08-01 17:25:45', '27688603', '超级管理员', '123456', '18d02440-abe0-11eb-879d-1831bf447e84', 0, 0);
+INSERT INTO team_oa.user (id, username, password, create_time, salt, state, last_time, update_time, qq, hlx_user_nick, hlx_user_id, dept_id, integral, gourd) VALUES ('fa50e3d147e810945b18e384d40a4ca6', 'superAdmin', '8da386aa55b0f5a2b3aecd39465feb5d', '2021-03-16 22:37:13', 'superAdmin', 0, null, '2021-08-01 17:25:45', '27688603', '超级管理员', '123456', '18d02440-abe0-11eb-879d-1831bf447e84', 0, 0);
 
 INSERT INTO team_oa.user_role (id, role_id, user_id, remarks) VALUES ('565d3b81-c472-11eb-bc92-00163e12aeb5', 'b8fcdf42-8bdc-11eb-b113-00163e0a10e9', 'fa50e3d147e810945b18e384d40a4ca6', null);
 INSERT INTO team_oa.user_role (id, role_id, user_id, remarks) VALUES ('5cde7a3a-d42b-11ec-8189-00163e0cb384', 'e9b7762a-d38d-11ec-8189-00163e0cb384', 'fa50e3d147e810945b18e384d40a4ca6', null);
