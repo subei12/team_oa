@@ -16,6 +16,7 @@ create table dept
     id               varchar(100)  not null
         primary key,
     name             varchar(100)  null comment '分类名',
+    dept_key         VARCHAR(255)  NULL COMMENT '部门key',
     create_date      datetime      null comment '创建时间',
     create_user_id   varchar(100)  null comment '创建用户id,这里放用户名好了',
     state            int(1)        null comment '状态；0-正常，1-不可用',
