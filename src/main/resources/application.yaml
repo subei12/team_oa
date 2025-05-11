@@ -79,6 +79,9 @@ hlx:
     #板块数据，包含三个维度的帖子列表
     #hlxCategoryData: https://floor.huluxia.com/home/post/list/IOS/1.1
     hlxCategoryData: https://floor.huluxia.com/post/list/ANDROID/4.1.8?market_id=floor_huluxia
+  # 版块限制，如结算贴所在版块、查询发帖情况
+  categoryId: 63
+
 qq:
   url: http://send.frp.jsls9.top
   verifyKey: su123456

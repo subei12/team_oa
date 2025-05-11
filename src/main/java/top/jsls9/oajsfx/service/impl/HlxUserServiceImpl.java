@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import top.jsls9.oajsfx.constant.HlxConstant;
 import top.jsls9.oajsfx.dao.*;
 import top.jsls9.oajsfx.enums.PostLogicVariable;
 import top.jsls9.oajsfx.enums.SysSourceLogType;
@@ -101,7 +102,7 @@ public class HlxUserServiceImpl implements HlxService {
                 return RespBean.error("结算失败，此贴不在自助结算时间范围内。");
             }
             //判断是否为技术分享板块的帖子
-            if(StringUtils.isBlank(String.valueOf((postDetails.getPost().getCategory().getCategoryID()))) || !String.valueOf((postDetails.getPost().getCategory().getCategoryID())).equals("96") ){
+            if(StringUtils.isBlank(String.valueOf((postDetails.getPost().getCategory().getCategoryID()))) || !String.valueOf((postDetails.getPost().getCategory().getCategoryID())).equals(HlxConstant.CATEGORY_ID) ){
                 return RespBean.error("结算失败，此贴非技术分享帖子（你别跟我整什么花里胡哨的）。");
             }
             //判断是否为三天前的帖子
@@ -297,7 +298,7 @@ public class HlxUserServiceImpl implements HlxService {
      */
     @Override
     public Object getPostsByUserIdNew(String userId) throws IOException, ParseException {
-        String catId = "96";//96表示技术分享板块
+        String catId = HlxConstant.CATEGORY_ID;//96表示技术分享板块
         //开始帖子，第一次为0
         String start = "0";
         //标记，是否继续循环
@@ -366,7 +367,7 @@ public class HlxUserServiceImpl implements HlxService {
      */
     @Override
     public Posts getPostsByUserIdQueryOne(String userId) throws IOException, ParseException {
-        String catId = "96";//96表示技术分享板块
+        String catId = HlxConstant.CATEGORY_ID;//96表示技术分享板块
         //开始帖子，第一次为0
         String start = "0";
         //标记，是否继续循环

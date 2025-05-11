@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import top.jsls9.oajsfx.constant.HlxConstant;
 import top.jsls9.oajsfx.hlxPojo.Posts;
 import top.jsls9.oajsfx.hlxPojo.PostsJsonRootBean;
 import top.jsls9.oajsfx.model.User;
@@ -80,7 +81,7 @@ public class HlxController {
         if(user==null){
             return RespBean.error("查询失败，此用户不是团队成员。", Collections.emptyList());
         }
-        String catId = "96";//96表示技术分享板块
+        String catId = HlxConstant.CATEGORY_ID;//96表示技术分享板块
         String postJsonUrl="http://floor.huluxia.com/post/create/list/ANDROID/2.0?start=0&count=50&user_id="+userId;
         Connection.Response response = HttpUtils.get(postJsonUrl);
         String body = response.body();
