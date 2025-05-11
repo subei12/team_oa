@@ -7,14 +7,17 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import top.jsls9.oajsfx.hlxPojo.*;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
+import java.util.stream.Stream;
 
 /**提取的关于hlx会用常用的方法集合
  * @author bSu
@@ -40,23 +43,30 @@ public class HlxUtils {
     @Value("${hlx.url.userInfo}")
     private String userInfoUrl;
 
+    @Autowired
+    private MailUtils mailUtils;
+
     /**
      * 获取key
      * @return
      */
     public String getKey(){
         return this.key;
-        // try {
-        //     String url=getKeyUrl;
-        //     Connection.Response response = HttpUtils.get(url);
-        //     String body = response.body();
-        //     JSONObject json=new JSONObject();
-        //     GetKeyRootBean getKeyRootBean = json.parseObject(response.body(), GetKeyRootBean.class);
-        //     return getKeyRootBean.get_key();
-        // }catch (Exception e){
-        //     logger.error("获取key失败，",e);
-        //     return null;
-        // }
+         /*try {
+             String url=getKeyUrl;
+             Connection.Response response = HttpUtils.get(url);
+             String body = response.body();
+             JSONObject json=new JSONObject();
+             GetKeyRootBean getKeyRootBean = json.parseObject(response.body(), GetKeyRootBean.class);
+             if (getKeyRootBean.get_key() == null) {
+                 mailUtils.sendSimpleMail("2622798046@qq.com", "OA - key失效", "OA系统key已失效，请尽快更换。");
+             }
+             return getKeyRootBean.get_key();
+         }catch (Exception e){
+             logger.error("获取key失败，",e);
+             mailUtils.sendSimpleMail("2622798046@qq.com", "OA - key失效", "OA系统key已失效，请尽快更换。");
+             return null;
+         }*/
     }
 
     /**
@@ -119,13 +129,23 @@ public class HlxUtils {
         if(text.length()<5){
             text=text+".....";
         }
-        String url="http://floor.huluxia.com/credits/transfer/ANDROID/2.0?platform=2&gkey=000000&app_version=4.0.0.1&versioncode=20141415&market_id=floor_web&_key="+getKey()+"&device_code=%5Bw%5D02%3A00%3A00%3A00%3A00%3A00%5Bd%5D830b9382-7eef-4557-b585-afd28f674fe5";
+        String deviceCode = getDeviceCode();
+        String url="https://floor.huluxia.com:443/credits/transfer/ANDROID/4.2.4?platform=2&gkey=000000&app_version=4.3.1.8&versioncode=413&market_id=tool_web&_key="+ getKey() +"&device_code="+deviceCode+"&phone_brand_type=UN";
         Map<String,String > paramMap=new HashMap();
         paramMap.put("post_id",postId);
         paramMap.put("type_id",type);
         paramMap.put("isadmin","0");
         paramMap.put("score",sorce);
         paramMap.put("score_txt",text);
+
+        Map<String, String> signMap = new HashMap<>();
+        signMap.put("_key", getKey());
+        signMap.put("device_code", deviceCode);
+        signMap.put("post_id", postId);
+        signMap.put("score_txt", text);
+        signMap.put("score", sorce);
+        paramMap.put("sign", toSign(signMap));
+
         Connection.Response post = HttpUtils.post(url, paramMap);
         logger.info(post.body());
         JSONObject json=new JSONObject();
@@ -149,28 +169,42 @@ public class HlxUtils {
         if(text.length()<5){
             text=text+".....";
         }
-        String url="http://floor.huluxia.com/credits/transfer/ANDROID/2.0?platform=2&gkey=000000&app_version=4.0.0.1&versioncode=20141415&market_id=floor_web&_key="+getKey()+"&device_code=%5Bw%5D02%3A00%3A00%3A00%3A00%3A00%5Bd%5D830b9382-7eef-4557-b585-afd28f674fe5";
+        String deviceCode = getDeviceCode();
+        String url="https://floor.huluxia.com:443/credits/transfer/ANDROID/4.2.4?platform=2&gkey=000000&app_version=4.3.1.8&versioncode=413&market_id=tool_web&_key="+ getKey() +"&device_code="+deviceCode+"&phone_brand_type=UN";
         Map<String, String> paramMap=new HashMap();
         paramMap.put("post_id",postId);
         paramMap.put("type_id",type);
         paramMap.put("isadmin","0");
         //paramMap.put("score",sorce);
         paramMap.put("score_txt",text);
+
+        Map<String, String> signMap = new HashMap<>();
+        signMap.put("_key", getKey());
+        signMap.put("device_code", deviceCode);
+        signMap.put("post_id", postId);
+        signMap.put("score_txt", text);
+
         if(Integer.valueOf(sorce) <= 200){
             //小于200可以直接赠送
             paramMap.put("score", sorce);
+            signMap.put("score", sorce);
+            paramMap.put("sign", toSign(signMap));
             Connection.Response post = HttpUtils.post(url, paramMap);
             logger.info(post.body());
             logger.info("type：{} 、postId：{}，一次性赠送{}完毕！", type, postId, sorce);
         }else {
             for(int i=0;(Integer.valueOf(sorce)/200)>i;i++){
                 paramMap.put("score", "200");
+                signMap.put("score", "200");
+                paramMap.put("sign", toSign(signMap));
                 Connection.Response post = HttpUtils.post(url, paramMap);
                 logger.info(post.body());
                 logger.info("type：{} 、postId：{}，第"+(i+1)+"次赠送200", type, postId);
             }
             if(Integer.valueOf(sorce) %200 >0){
                 paramMap.put("score", String.valueOf( Integer.valueOf(sorce) %200 ));
+                signMap.put("score", String.valueOf( Integer.valueOf(sorce) %200 ));
+                paramMap.put("sign", toSign(signMap));
                 Connection.Response post = HttpUtils.post(url, paramMap);
                 logger.info(post.body());
                 logger.info("type：{} 、postId：{}，剩下一次性赠送: {}", type, postId, Integer.valueOf(sorce)%200);
@@ -198,28 +232,41 @@ public class HlxUtils {
         if (StringUtils.isBlank(key)) {
             key = getKey();
         }
-        String url="http://floor.huluxia.com/credits/transfer/ANDROID/2.0?platform=2&gkey=000000&app_version=4.0.0.1&versioncode=20141415&market_id=floor_web&_key="+key+"&device_code=%5Bw%5D02%3A00%3A00%3A00%3A00%3A00%5Bd%5D830b9382-7eef-4557-b585-afd28f674fe5";
+        String deviceCode = getDeviceCode();
+        String url="https://floor.huluxia.com:443/credits/transfer/ANDROID/4.2.4?platform=2&gkey=000000&app_version=4.3.1.8&versioncode=413&market_id=tool_web&_key="+ getKey() +"&device_code="+deviceCode+"&phone_brand_type=UN";
         Map<String, String> paramMap=new HashMap();
         paramMap.put("post_id",postId);
         paramMap.put("type_id",type);
         paramMap.put("isadmin","0");
         //paramMap.put("score",sorce);
         paramMap.put("score_txt",text);
+        Map<String, String> signMap = new HashMap<>();
+        signMap.put("_key", getKey());
+        signMap.put("device_code", deviceCode);
+        signMap.put("post_id", postId);
+        signMap.put("score_txt", text);
+
         if(Integer.valueOf(sorce) <= 200){
             //小于200可以直接赠送
             paramMap.put("score", sorce);
+            signMap.put("score", sorce);
+            paramMap.put("sign", toSign(signMap));
             Connection.Response post = HttpUtils.post(url, paramMap);
             logger.info(post.body());
             logger.info("type：{} 、postId：{}，一次性赠送{}完毕！", type, postId, sorce);
         }else {
             for(int i=0;(Integer.valueOf(sorce)/200)>i;i++){
                 paramMap.put("score", "200");
+                signMap.put("score", sorce);
+                paramMap.put("sign", toSign(signMap));
                 Connection.Response post = HttpUtils.post(url, paramMap);
                 logger.info(post.body());
                 logger.info("type：{} 、postId：{}，第"+(i+1)+"次赠送200", type, postId);
             }
             if(Integer.valueOf(sorce) %200 >0){
                 paramMap.put("score", String.valueOf( Integer.valueOf(sorce) %200 ));
+                signMap.put("score", String.valueOf( Integer.valueOf(sorce) %200 ));
+                paramMap.put("sign", toSign(signMap));
                 Connection.Response post = HttpUtils.post(url, paramMap);
                 logger.info(post.body());
                 logger.info("type：{} 、postId：{}，剩下一次性赠送: {}", type, postId, Integer.valueOf(sorce)%200);
@@ -288,6 +335,77 @@ public class HlxUtils {
         Connection.Response response = HttpUtils.get(postJsonUrl);
         String body = response.body();
         return body;
+    }
+
+    /**
+     * 签名算法
+     * @param map 签名参数
+     */
+    public String toSign(Map<String, String> map) {
+        if (map == null || map.isEmpty()) {
+            return getSign(""); // 处理空map边界情况
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        // 字典序排序
+        map.keySet().stream()
+                .sorted() // 自然字典序
+                .forEachOrdered(key -> appendEntry(sb, key, map.get(key)));
+        logger.info("sb: {}", sb.toString());
+        return getSign(sb.toString());
+    }
+
+    private void appendEntry(StringBuilder sb, String key, String value) {
+        sb.append(key)
+                .append(value != null ? value : ""); // 显式处理null值
+    }
+
+    /**
+     * 随机设备码
+     * @return  设备码
+     */
+    public String getDeviceCode() {
+        String randomCode = UUID.randomUUID().toString();
+        return "[d]" + randomCode;
+    }
+
+    /**
+     * 签名
+     * @param text  签名参数字符串
+     * @return  sign
+     */
+    public static String getSign(String text) {
+        // 拼接原始文本和固定盐值
+        String combined = text + "dc9ae0b1c8bae7ccf421cd1607bc3b14";
+
+        try {
+            // 创建 MD5 摘要实例
+            MessageDigest md = MessageDigest.getInstance("MD5");
+
+            // 更新字节数据并生成哈希
+            byte[] hashBytes = md.digest(combined.getBytes(StandardCharsets.UTF_8));
+
+            // 将字节数组转换为十六进制字符串
+            return bytesToHex(hashBytes);
+
+        } catch (NoSuchAlgorithmException e) {
+            // 理论上 MD5 算法在所有 Java 平台都可用
+            throw new RuntimeException("MD5 algorithm not available", e);
+        }
+    }
+
+    // 将字节数组转换为十六进制表示的辅助方法
+    private static String bytesToHex(byte[] bytes) {
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : bytes) {
+            String hex = Integer.toHexString(0xff & b); // 确保无符号转换
+            if (hex.length() == 1) {
+                hexString.append('0'); // 补零保证两位长度
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
     }
 
 
