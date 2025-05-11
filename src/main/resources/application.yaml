@@ -31,6 +31,30 @@ spring:
   # 本地启动使加上false，用来过滤停掉操作日志
   aop:
     auto: true
+  # 邮件配置
+  mail:
+    # 邮箱账号如xxx@gmail.com
+    username:
+    # 邮箱授权码或密码
+    password:
+    # 邮箱host配置与username保持一致
+    host: smtp.163.com
+    properties:
+      mail:
+        smtp:
+          # QQ邮箱需要开启该配置
+          ssl:
+            enable: true
+  # Redis配置
+  redis:
+    # 数据库
+    database: 1
+    # 服务器地址
+    host: 127.0.0.1
+    # 默认端口为6379
+    port: 6379
+    # 如果有密码则配置密码auth 没有则不用配置
+    password: xxx
 
 #整合mybatis，如果mapper和xml不在同一目录，还需要配置关系mybatis.mapper-locations=classpath:mybatis/mapper/*.xml
 mybatis:
@@ -81,6 +105,12 @@ hlx:
     hlxCategoryData: https://floor.huluxia.com/post/list/ANDROID/4.1.8?market_id=floor_huluxia
   # 版块限制，如结算贴所在版块、查询发帖情况
   categoryId: 63
+  # 密钥相关配置
+  key:
+    # 账号密码 or QQ 登录获取 key，已弃用
+    url: https://
+    # 直接填写 KEY 值
+    text: xxx
 
 qq:
   url: http://send.frp.jsls9.top

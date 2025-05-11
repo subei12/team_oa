@@ -37,7 +37,7 @@ public class HlxUtils {
     @Value("${hlx.key.url}")
     private String getKeyUrl;
 
-    @Value("${hlx.key}")
+    @Value("${hlx.key.text}")
     private String key;
 
     @Value("${hlx.url.userInfo}")
