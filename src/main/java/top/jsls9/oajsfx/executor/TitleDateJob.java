@@ -68,12 +68,6 @@ public class TitleDateJob {
 
             //查询每个成员的情况
             for(User user : users){
-                top.jsls9.oajsfx.hlxPojo.User hlxUser = hlxUtils.queryUserInfo(user.getHlxUserId());
-                String identityTitle = hlxUser.getIdentityTitle();
-                if(StringUtils.isBlank(identityTitle) || !TITLE.equals(identityTitle)){
-                    //如果没有称号或者没有使用团队称号，不做统计
-                    continue;
-                }
                 //获取当前用户最新的板块帖子
                 Posts post = hlxService.getPostsByUserIdQueryOne(user.getHlxUserId());
                 if(post.getPostID() != 0){
