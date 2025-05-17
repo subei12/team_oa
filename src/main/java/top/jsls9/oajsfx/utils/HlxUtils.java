@@ -146,7 +146,7 @@ public class HlxUtils {
         signMap.put("score", sorce);
         paramMap.put("sign", toSign(signMap));
 
-        Connection.Response post = HttpUtils.post(url, paramMap);
+        Connection.Response post = HttpUtils.postByHlx(url, paramMap);
         logger.info(post.body());
         JSONObject json=new JSONObject();
         SendSorceJson jsonRootBean = json.parseObject(post.body(), SendSorceJson.class);
@@ -189,7 +189,7 @@ public class HlxUtils {
             paramMap.put("score", sorce);
             signMap.put("score", sorce);
             paramMap.put("sign", toSign(signMap));
-            Connection.Response post = HttpUtils.post(url, paramMap);
+            Connection.Response post = HttpUtils.postByHlx(url, paramMap);
             logger.info(post.body());
             logger.info("type：{} 、postId：{}，一次性赠送{}完毕！", type, postId, sorce);
         }else {
@@ -197,7 +197,7 @@ public class HlxUtils {
                 paramMap.put("score", "200");
                 signMap.put("score", "200");
                 paramMap.put("sign", toSign(signMap));
-                Connection.Response post = HttpUtils.post(url, paramMap);
+                Connection.Response post = HttpUtils.postByHlx(url, paramMap);
                 logger.info(post.body());
                 logger.info("type：{} 、postId：{}，第"+(i+1)+"次赠送200", type, postId);
             }
@@ -205,7 +205,7 @@ public class HlxUtils {
                 paramMap.put("score", String.valueOf( Integer.valueOf(sorce) %200 ));
                 signMap.put("score", String.valueOf( Integer.valueOf(sorce) %200 ));
                 paramMap.put("sign", toSign(signMap));
-                Connection.Response post = HttpUtils.post(url, paramMap);
+                Connection.Response post = HttpUtils.postByHlx(url, paramMap);
                 logger.info(post.body());
                 logger.info("type：{} 、postId：{}，剩下一次性赠送: {}", type, postId, Integer.valueOf(sorce)%200);
             }
@@ -251,7 +251,7 @@ public class HlxUtils {
             paramMap.put("score", sorce);
             signMap.put("score", sorce);
             paramMap.put("sign", toSign(signMap));
-            Connection.Response post = HttpUtils.post(url, paramMap);
+            Connection.Response post = HttpUtils.postByHlx(url, paramMap);
             logger.info(post.body());
             logger.info("type：{} 、postId：{}，一次性赠送{}完毕！", type, postId, sorce);
         }else {
@@ -259,7 +259,7 @@ public class HlxUtils {
                 paramMap.put("score", "200");
                 signMap.put("score", sorce);
                 paramMap.put("sign", toSign(signMap));
-                Connection.Response post = HttpUtils.post(url, paramMap);
+                Connection.Response post = HttpUtils.postByHlx(url, paramMap);
                 logger.info(post.body());
                 logger.info("type：{} 、postId：{}，第"+(i+1)+"次赠送200", type, postId);
             }
@@ -267,7 +267,7 @@ public class HlxUtils {
                 paramMap.put("score", String.valueOf( Integer.valueOf(sorce) %200 ));
                 signMap.put("score", String.valueOf( Integer.valueOf(sorce) %200 ));
                 paramMap.put("sign", toSign(signMap));
-                Connection.Response post = HttpUtils.post(url, paramMap);
+                Connection.Response post = HttpUtils.postByHlx(url, paramMap);
                 logger.info(post.body());
                 logger.info("type：{} 、postId：{}，剩下一次性赠送: {}", type, postId, Integer.valueOf(sorce)%200);
             }

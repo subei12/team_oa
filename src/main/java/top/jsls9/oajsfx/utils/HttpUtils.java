@@ -23,6 +23,7 @@ import org.jsoup.Connection;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * Http发送post请求工具，兼容http和https两种请求类型
@@ -132,6 +133,24 @@ public class HttpUtils {
      */
     public static Response post(String url, Map<String, String> paramMap) throws IOException {
         return doPostRequest(url, null, paramMap, null);
+    }
+
+    /**
+     * 社区 api 请求专用（新）
+     *
+     * @param url 请求URL地址
+     * @param paramMap 请求字符串参数集合
+     * @return HTTP响应对象
+     * @throws IOException 程序异常时抛出，由调用者处理
+     */
+    public static Response postByHlx(String url, Map<String, String> paramMap) throws IOException {
+        Response response = doPostRequest(url, null, paramMap, null);
+        String body = response.body();
+        JSONObject json = JSONObject.parseObject(body);
+        if (json.getInteger("status") != 1) {
+            throw new RuntimeException(json.getString("msg"));
+        }
+        return response;
     }
 
     /**

@@ -205,7 +205,7 @@ public class UserController {
         }catch (Exception e){
             e.printStackTrace();
             logger.error("奖励失败",e);
-            return RespBean.error("奖励失败"+e.getMessage());
+            return RespBean.error("奖励失败；原因："+e.getMessage());
         }
     }
 
