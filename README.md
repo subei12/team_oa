@@ -54,7 +54,57 @@ server {
 5. 团队预算管理
 6. 上报管理
 
-## Docker Deployment
+## Docker Compose Deployment (Frontend + Backend)
+
+This is the recommended way to deploy the application as it includes both the frontend (served by Nginx) and the backend API.
+
+### Prerequisites
+
+*   Docker and Docker Compose installed on your system.
+*   The backend application JAR file built (e.g., by running `mvn package` if you haven't built the backend image separately).
+*   A backend configuration file `application.yaml` placed in the root of this project.
+    *   **Important:** Ensure settings within `application.yaml` are correct for a Dockerized environment. For example, if your database is also running in Docker on the same Docker network, the database host might be the service name of the database container (e.g., `jdbc:mysql://db_container_name/team_oa`). If the database is external, ensure it's accessible from the Docker containers.
+*   (Optional) An Nginx configuration file named `nginx.conf` placed in the root of this project if you wish to override the default Nginx settings provided in `frontend/default.conf`. For most cases, the default should suffice.
+
+### Building and Running
+
+1.  Navigate to the project's root directory (where `docker-compose.yml` is located).
+2.  Run the following command to build the images (if not already built) and start the services:
+
+    ```bash
+    docker-compose up --build -d
+    ```
+    *   `--build`: Forces Docker Compose to build the images before starting the containers. This is useful if you've made changes to the Dockerfiles or application code.
+    *   `-d`: Runs the containers in detached mode (in the background).
+
+### Accessing the Application
+
+Once the containers are running, the application should be accessible via the Nginx frontend at:
+`http://localhost:8082`
+
+API requests to `http://localhost:8082/api/...` will be proxied by Nginx to the backend service.
+
+### Managing the Services
+
+*   **View Logs:**
+    *   For the frontend (Nginx): `docker-compose logs frontend`
+    *   For the backend API: `docker-compose logs backend`
+    *   Combined logs: `docker-compose logs`
+*   **Stop Services:**
+    ```bash
+    docker-compose down
+    ```
+    This command stops and removes the containers, networks, and volumes defined in the `docker-compose.yml` (unless volumes are declared as external).
+*   **Start Services (without rebuilding):**
+    ```bash
+    docker-compose up -d
+    ```
+*   **Stop Services (without removing):**
+    ```bash
+    docker-compose stop
+    ```
+
+## Docker Deployment (Backend Only)
 
 This application can be deployed using Docker.
 

@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile # Assumes Dockerfile for backend is in the root
+    container_name: team_oa_backend
+    restart: unless-stopped
+    volumes:
+      - ./application.yaml:/app/config/application.yaml # Mount backend config
+      - ./logs/backend:/app/logs   # Mount backend logs
+    # Networks allow services to discover each other by name.
+    # 'backend' service will be available at http://backend:8081 within the Docker network.
+    networks:
+      - teamoa_network
+    # No ports exposed to host directly for backend, access will be via Nginx proxy.
+    # If direct access to backend is needed for debugging, uncomment the following:
+    # ports:
+    #   - "8081:8081"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile # Dockerfile for frontend is in ./frontend directory
+    container_name: team_oa_frontend
+    ports:
+      - "8082:8082" # Expose Nginx on host port 8082
+    restart: unless-stopped
+    volumes:
+      # Allows mounting a custom Nginx config.
+      # The image already contains a default.conf, so this is optional for overriding.
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      # If frontend logs need to be persisted (e.g., Nginx access/error logs):
+      # - ./logs/frontend:/var/log/nginx
+    depends_on:
+      - backend
+    networks:
+      - teamoa_network
+
+networks:
+  teamoa_network:
+    driver: bridge
