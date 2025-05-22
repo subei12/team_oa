@@ -8,7 +8,7 @@ on:
 # 定义推送到Docker Hub的镜像名称。
 # 请将 'YOUR_DOCKERHUB_USERNAME' 替换为您的Docker Hub用户名或在GitHub Secrets中设置。
 env:
-  DOCKERHUB_USERNAME: YOUR_DOCKERHUB_USERNAME # GitHub仓库的Settings -> Secrets and variables -> Actions中配置此变量，或直接在此处填写
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }} # GitHub仓库的Settings -> Secrets and variables -> Actions中配置此变量，或直接在此处填写
   BACKEND_IMAGE_NAME: team_oa_backend
   FRONTEND_IMAGE_NAME: team_oa_frontend
 
