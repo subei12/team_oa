@@ -14,30 +14,62 @@ services:
     # 'backend' service will be available at http://backend:8081 within the Docker network.
     networks:
       - teamoa_network
-    # No ports exposed to host directly for backend, access will be via Nginx proxy.
+    # No ports exposed to host directly for backend, access will be via frontend proxy.
     # If direct access to backend is needed for debugging, uncomment the following:
     # ports:
     #   - "8081:8081"
 
+  # Option 1: Nginx Frontend (default)
+  # Uncomment this service and comment out 'frontend-caddy' to use Nginx.
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile # Dockerfile for frontend is in ./frontend directory
-    container_name: team_oa_frontend
+      dockerfile: Dockerfile # This is the Nginx Dockerfile
+    container_name: team_oa_frontend_nginx
     ports:
-      - "8082:8082" # Expose Nginx on host port 8082
+      - "8082:8082" # Nginx listens on 8082 by default as per its config
     restart: unless-stopped
     volumes:
       # Allows mounting a custom Nginx config.
       # The image already contains a default.conf, so this is optional for overriding.
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf 
       # If frontend logs need to be persisted (e.g., Nginx access/error logs):
-      # - ./logs/frontend:/var/log/nginx
+      - ./logs/frontend_nginx:/var/log/nginx # Optional: Nginx logs
     depends_on:
       - backend
     networks:
       - teamoa_network
 
+  # Option 2: Caddy Frontend (for automatic SSL)
+  # Uncomment this service and comment out 'frontend' (Nginx) to use Caddy.
+  # Ensure you have configured 'frontend/Caddyfile' with your domain.
+  # frontend-caddy:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile.caddy # This is the Caddy Dockerfile
+  #   container_name: team_oa_frontend_caddy
+  #   ports:
+  #     - "80:80"   # Caddy needs port 80 for HTTP challenge (ACME)
+  #     - "443:443" # Caddy serves HTTPS on port 443
+  #   restart: unless-stopped
+  #   volumes:
+  #     # Mount Caddyfile to allow external changes without rebuilding image (optional, as it's copied in Dockerfile.caddy)
+  #     - ./frontend/Caddyfile:/etc/caddy/Caddyfile 
+  #     # Caddy needs a volume to store SSL certificates and other state.
+  #     - caddy_data:/data 
+  #     - caddy_config:/config
+  #     # - ./logs/frontend_caddy:/var/log/caddy # If Caddy is configured to log to a file
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - teamoa_network
+
 networks:
   teamoa_network:
     driver: bridge
+
+# Top-level volumes definition for services that require persistent storage.
+volumes:
+  caddy_data: # Used by frontend-caddy to store SSL certificates and other Caddy data.
+  caddy_config: # Used by frontend-caddy to store Caddy configuration and state.
+  # Define other volumes if needed, e.g., for backend data persistence if it were a database

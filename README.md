@@ -65,6 +65,28 @@ This is the recommended way to deploy the application as it includes both the fr
 *   A backend configuration file `application.yaml` placed in the root of this project.
     *   **Important:** Ensure settings within `application.yaml` are correct for a Dockerized environment. For example, if your database is also running in Docker on the same Docker network, the database host might be the service name of the database container (e.g., `jdbc:mysql://db_container_name/team_oa`). If the database is external, ensure it's accessible from the Docker containers.
 *   (Optional) An Nginx configuration file named `nginx.conf` placed in the root of this project if you wish to override the default Nginx settings provided in `frontend/default.conf`. For most cases, the default should suffice.
+*   (Optional for Caddy) If using the Caddy frontend for automatic SSL, edit `frontend/Caddyfile` and replace `your-domain.com` with your actual domain name. Ensure your domain's DNS A/AAAA records point to the server where Docker is running.
+
+### Choosing a Frontend Service (Nginx or Caddy)
+
+This project supports two frontend service options within Docker Compose:
+
+*   **Nginx (Default):** Serves the frontend on HTTP (port `8082` by default). It's reliable and suitable for environments where SSL is handled externally (e.g., by a load balancer).
+*   **Caddy (Optional):** Serves the frontend with automatic HTTPS (ports `80` for HTTP-to-HTTPS redirects and `443` for HTTPS). Caddy will attempt to procure SSL certificates from Let's Encrypt or ZeroSSL. This is ideal if you want SSL termination directly at the container level.
+
+**To choose your frontend service:**
+
+1.  Open the `docker-compose.yml` file.
+2.  **To use Nginx (default):**
+    *   Ensure the `frontend` service block (often named `team_oa_frontend_nginx` or similar) is **uncommented**.
+    *   Ensure the `frontend-caddy` service block is **commented out** (lines typically start with `#`).
+3.  **To use Caddy:**
+    *   Ensure the `frontend` (Nginx) service block is **commented out**.
+    *   Ensure the `frontend-caddy` service block is **uncommented**.
+    *   Make sure you have configured `your-domain.com` in `frontend/Caddyfile`.
+    *   Caddy requires persistent storage for certificates. The `docker-compose.yml` defines `caddy_data` and `caddy_config` volumes for this. These will be created automatically.
+
+**Note:** You should only run one frontend service at a time to avoid port conflicts and confusion.
 
 ### Building and Running
 
@@ -79,17 +101,16 @@ This is the recommended way to deploy the application as it includes both the fr
 
 ### Accessing the Application
 
-Once the containers are running, the application should be accessible via the Nginx frontend at:
-`http://localhost:8082`
-
-API requests to `http://localhost:8082/api/...` will be proxied by Nginx to the backend service.
+*   **If using Nginx (default):** The application should be accessible via `http://localhost:8082`.
+*   **If using Caddy with a configured domain:** The application should be accessible via `https://your-domain.com` (Caddy automatically redirects HTTP to HTTPS). API requests to `/api/...` will be proxied by Nginx/Caddy to the backend service.
 
 ### Managing the Services
 
 *   **View Logs:**
-    *   For the frontend (Nginx): `docker-compose logs frontend`
+    *   For the Nginx frontend (if active): `docker-compose logs frontend` (or `team_oa_frontend_nginx`)
+    *   For the Caddy frontend (if active): `docker-compose logs frontend-caddy`
     *   For the backend API: `docker-compose logs backend`
-    *   Combined logs: `docker-compose logs`
+    *   Combined logs for all running services: `docker-compose logs`
 *   **Stop Services:**
     ```bash
     docker-compose down

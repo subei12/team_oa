@@ -1,0 +1,34 @@
+# Use an official Caddy image as a parent image
+FROM caddy:2.7-alpine
+
+# Install git to clone the frontend repository
+# Caddy alpine images might not have git by default.
+RUN apk add --no-cache git
+
+# Set working directory for cloning (optional, but keeps things organized)
+WORKDIR /temp_clone
+
+# Clone the frontend static content from GitHub
+# This clones the master branch by default.
+RUN git clone https://github.com/subei12/team_oa_web.git .
+
+# Create the target directory for Caddy if it doesn't exist
+# and move the cloned content into Caddy's default serve directory /usr/share/caddy
+# Caddy's default site root can vary, but /usr/share/caddy is a common choice for custom setups.
+# Alternatively, Caddy can be configured to serve from any path.
+# For simplicity, we'll use /srv as Caddy's default in recent versions often is /srv
+RUN mkdir -p /usr/share/caddy     && mv /temp_clone/* /usr/share/caddy/     && rm -rf /temp_clone
+
+# Copy the Caddyfile (which will define site configuration)
+# This file (Caddyfile) will be created in the next step and placed in the frontend directory locally.
+COPY Caddyfile /etc/caddy/Caddyfile
+
+# Expose ports 80 (for HTTP) and 443 (for HTTPS)
+# Caddy will automatically try to use these for ACME HTTP challenge and serving HTTPS.
+EXPOSE 80
+EXPOSE 443
+
+# The default CMD for the caddy image is `caddy run --config /etc/caddy/Caddyfile --adapter caddyfile`
+# which is usually what's needed. So, no explicit CMD is required unless customization is needed for startup.
+# If you need to ensure it picks up your Caddyfile and runs in the foreground:
+# CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile"]

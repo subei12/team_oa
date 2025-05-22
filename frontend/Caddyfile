@@ -1,0 +1,39 @@
+# Replace your-domain.com with your actual domain name.
+# Caddy will automatically provision and renew SSL certificates for this domain.
+# Ensure your domain's DNS A/AAAA records point to the server running this Caddy instance.
+your-domain.com {
+    # Set this path to match the root directory of your site
+    root * /usr/share/caddy
+
+    # Enable the static file server.
+    file_server
+
+    # Proxy API requests to the backend service.
+    # 'backend' is the service name defined in docker-compose.yml,
+    # and 8081 is the port the backend application listens on.
+    reverse_proxy /api/* http://backend:8081
+
+    # Optional: Enable access logging
+    # log {
+    #   output stdout
+    #   format console
+    # }
+
+    # Optional: Basic Gzip compression for text-based assets
+    # encode gzip
+}
+
+# If you want to serve HTTP and redirect to HTTPS (Caddy does this by default
+# when a domain name is provided in the site address), you don't need a separate block for :80.
+# Caddy automatically handles HTTP->HTTPS redirection.
+
+# Example for local development without HTTPS (not recommended for production):
+# localhost:8082 {
+#    root * /usr/share/caddy
+#    file_server
+#    reverse_proxy /api/* http://backend:8081
+#    log {
+#      output stdout
+#      format console
+#    }
+# }
