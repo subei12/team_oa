@@ -2,6 +2,7 @@ name: Publish Docker Images to Docker Hub
 
 # 此工作流程在master分支有push操作时触发。
 on:
+  workflow_dispatch:  # 支持手动触发
   push:
     branches: [ master ]
 
