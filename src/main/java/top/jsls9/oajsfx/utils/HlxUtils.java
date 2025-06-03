@@ -257,7 +257,7 @@ public class HlxUtils {
         }else {
             for(int i=0;(Integer.valueOf(sorce)/200)>i;i++){
                 paramMap.put("score", "200");
-                signMap.put("score", sorce);
+                signMap.put("score", "200");
                 paramMap.put("sign", toSign(signMap));
                 Connection.Response post = HttpUtils.postByHlx(url, paramMap);
                 logger.info(post.body());
