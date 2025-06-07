@@ -5,11 +5,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile # Assumes Dockerfile for backend is in the root
-    container_name: team_oa_backend
+    container_name: team_oa_api
     restart: unless-stopped
     volumes:
       - ./application.yaml:/app/config/application.yaml # Mount backend config
-      - ./logs/backend:/app/logs   # Mount backend logs
+      - ./logs:/app/logs   # Mount backend logs
     # Networks allow services to discover each other by name.
     # 'backend' service will be available at http://backend:8081 within the Docker network.
     networks:
@@ -25,7 +25,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile # This is the Nginx Dockerfile
-    container_name: team_oa_frontend_nginx
+    container_name: team_oa_web_nginx
     ports:
       - "8082:8082" # Nginx listens on 8082 by default as per its config
     restart: unless-stopped
@@ -47,7 +47,7 @@ services:
   #   build:
   #     context: ./frontend
   #     dockerfile: Dockerfile.caddy # This is the Caddy Dockerfile
-  #   container_name: team_oa_frontend_caddy
+  #   container_name: team_oa_web_caddy
   #   ports:
   #     - "80:80"   # Caddy needs port 80 for HTTP challenge (ACME)
   #     - "443:443" # Caddy serves HTTPS on port 443

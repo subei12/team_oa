@@ -69,7 +69,7 @@ logging:
     top.jsls9.oajsfx: debug
     root: error
   file:
-    path: myLogs
+    path: logs
 
 
 server:
@@ -90,7 +90,7 @@ xxl:
       address:
       ip:
       port: 9999
-      logpath: myLogs/xxl-job/jobhandler
+      logpath: logs/xxl-job/jobhandler
       logretentiondays: 30
 
 ### 自定义配置信息

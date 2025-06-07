@@ -158,7 +158,7 @@ To run the application in a Docker container, you'll need your `application.yaml
         -v /path/to/your/config/application.yaml:/app/config/application.yaml \
         -v /path/to/your/logs:/app/logs \
         --name team_oa_app \
-        team_oa
+        team_oa_api
     ```
 
     **Explanation of the command:**
@@ -167,7 +167,7 @@ To run the application in a Docker container, you'll need your `application.yaml
     *   `-v /path/to/your/config/application.yaml:/app/config/application.yaml`: Mounts your local `application.yaml` into the container at `/app/config/application.yaml`. **Remember to replace `/path/to/your/config/application.yaml` with the actual path to your file.**
     *   `-v /path/to/your/logs:/app/logs`: Mounts a local directory for storing logs from the application. **Remember to replace `/path/to/your/logs` with the actual path to your desired log directory.**
     *   `--name team_oa_app`: Assigns a name to the running container for easier management.
-    *   `team_oa`: The name of the image to run (which you used when building).
+    *   `team_oa_api`: The name of the image to run (which you used when building).
 
 ### Accessing the Application
 
