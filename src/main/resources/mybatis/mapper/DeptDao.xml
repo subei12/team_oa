@@ -106,7 +106,7 @@
 
 
   <select id="getDepts" resultMap="BaseResultMap">
-        select id, name, create_date, create_user_id, state, source from Dept where state=0
+        select id, name, create_date, create_user_id, state, source from Dept where state=0 order by create_date desc
   </select>
 
   <update id="updateNameById" parameterType="top.jsls9.oajsfx.model.Dept">

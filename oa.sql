@@ -370,6 +370,8 @@ INSERT INTO team_oa.permission (id, name, description, url, perms, parent_id, ty
 INSERT INTO team_oa.permission (id, name, description, url, perms, parent_id, type, order_num, icon, status, create_time, update_time) VALUES (45, '我的信息-OA账户余额提取', '提现到社区', '/user/gourd/withdrawal/**==POST', 'system:user:my:withdrawal', 6, 2, 19, null, 0, '2022-06-18 16:57:55', null);
 INSERT INTO team_oa.permission (id, name, description, url, perms, parent_id, type, order_num, icon, status, create_time, update_time) VALUES (46, '部门管理-查看各团队一个月内未发帖情况', '', '/user/posSituationt==GET', 'system:dept:user:posSituationt', 23, 2, 84, null, 0, '2022-06-18 19:42:51', null);
 INSERT INTO team_oa.permission (id, name, description, url, perms, parent_id, type, order_num, icon, status, create_time, update_time) VALUES (47, '部门管理-奖励日志', '', '/sysSourceLogs==GET', 'system:dept:sysSourceLogs', 23, 2, 85, null, 0, '2022-08-25 15:43:12', '2022-08-25 15:54:09');
+INSERT INTO team_oa.permission (id, name, description, url, perms, parent_id, type, order_num, icon, status, create_time, update_time) VALUES (48, '部门管理-删除', null, '/dept/*==DELETE', 'system:dept:delete', 23, 2, 86, null, 0, NOW(), null);
+INSERT INTO team_oa.permission (id, name, description, url, perms, parent_id, type, order_num, icon, status, create_time, update_time) VALUES (49, '部门管理-新增', null, '/dept==POST', 'system:dept:add', 23, 2, 87, null, 0, NOW(), null);
 
 
 INSERT INTO team_oa.post_logic (id, logic, logic_description, prompt, create_date, update_date, state) VALUES (1, '$title.indexOf(''NB'') >= 0 || $title.indexOf(''HR'') >= 0 || $title.indexOf(''WD'') >= 0 || $title.indexOf(''MER'') >= 0 || $title.indexOf(''真假程序员'') >= 0', '标题需要有团队名', '非团队贴，不予结算。', '2022-01-08 17:10:10', '2022-10-25 16:40:03', 0);

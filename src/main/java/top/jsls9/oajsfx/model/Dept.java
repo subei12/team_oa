@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * web_sort
+ * dept
  * @author 
  */
 public class Dept implements Serializable {
