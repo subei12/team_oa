@@ -8,16 +8,26 @@ import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import top.jsls9.oajsfx.dao.*;
 import top.jsls9.oajsfx.enums.SysSourceLogType;
 import top.jsls9.oajsfx.model.*;
+import top.jsls9.oajsfx.model.dto.UserRewardDTO;
 import top.jsls9.oajsfx.service.UserService;
 import top.jsls9.oajsfx.utils.HlxUtils;
 import top.jsls9.oajsfx.utils.RedisUtil;
+import top.jsls9.oajsfx.utils.RespBean;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -287,4 +297,99 @@ public class UserServiceImpl implements UserService {
         return o;
     }
 
+    @Override
+    public RespBean batchUpdateUserReward(MultipartFile file) throws Exception {
+        InputStream inputStream = file.getInputStream();
+        Workbook workbook = new XSSFWorkbook(inputStream);
+        Sheet sheet = workbook.getSheetAt(0);
+
+        List<UserRewardDTO> rewards = new ArrayList<>();
+        int totalSource = 0;
+
+        for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+            Row row = sheet.getRow(i);
+            if (row == null) {
+                continue;
+            }
+
+            UserRewardDTO reward = new UserRewardDTO();
+            reward.setHlxUserId(getStringCellValue(row.getCell(0)));
+            reward.setNickName(getStringCellValue(row.getCell(1)));
+            reward.setSource(getIntegerCellValue(row.getCell(2)));
+            reward.setReason(getStringCellValue(row.getCell(3)));
+
+            // Validate data
+            if (StringUtils.isBlank(reward.getHlxUserId()) || reward.getSource() == null || reward.getSource() <= 0) {
+                reward.setError("数据缺失或无效.");
+            } else {
+                totalSource += reward.getSource();
+            }
+            rewards.add(reward);
+        }
+
+        // 校验预算
+        User userLogin = getUserLogin();
+        Dept dept = deptDao.selectByPrimaryKey(userLogin.getDeptId());
+        if (dept.getSource() < totalSource) {
+            return RespBean.error("预算不足.");
+        }
+
+        List<String> errors = new ArrayList<>();
+        for (UserRewardDTO reward : rewards) {
+            if (reward.getError() != null) {
+                errors.add("用户ID: " + reward.getHlxUserId() + ", 错误: " + reward.getError());
+                continue;
+            }
+
+            try {
+                BudgetLog budgetLog = new BudgetLog();
+                User user = queryUserByHlxUserId(reward.getHlxUserId());
+                if (user == null) {
+                    errors.add("用户ID: " + reward.getHlxUserId() + ", 错误: 用户不存在.");
+                    continue;
+                }
+                budgetLog.setUserId(user.getId());
+                budgetLog.setSource(reward.getSource());
+                budgetLog.setText(reward.getReason());
+                budgetLog.setCreateUserId(userLogin.getId());
+                updateUserRewardByUserId(budgetLog);
+            } catch (Exception e) {
+                errors.add("用户ID: " + reward.getHlxUserId() + ", 错误: " + e.getMessage());
+            }
+        }
+
+        if (!errors.isEmpty()) {
+            return RespBean.error("批量发放奖励失败.", errors);
+        }
+
+        return RespBean.success("批量发放奖励成功.");
+    }
+
+    private String getStringCellValue(Cell cell) {
+        if (cell == null) {
+            return null;
+        }
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                return String.valueOf((long) cell.getNumericCellValue());
+            default:
+                return null;
+        }
+    }
+
+    private Integer getIntegerCellValue(Cell cell) {
+        if (cell == null) {
+            return null;
+        }
+        switch (cell.getCellType()) {
+            case STRING:
+                return Integer.parseInt(cell.getStringCellValue());
+            case NUMERIC:
+                return (int) cell.getNumericCellValue();
+            default:
+                return null;
+        }
+    }
 }

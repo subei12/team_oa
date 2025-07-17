@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import top.jsls9.oajsfx.model.BudgetLog;
 import top.jsls9.oajsfx.model.User;
 import top.jsls9.oajsfx.model.UserRole;
@@ -249,6 +250,17 @@ public class UserController {
             logger.error("查询失败",e.getMessage());
             e.printStackTrace();
             return RespBean.error("查询失败");
+        }
+    }
+
+    @ApiOperation("批量发放奖励")
+    @PostMapping("/user/batch-reward")
+    public RespBean batchUpdateUserReward(@RequestParam("file") MultipartFile file) {
+        try {
+            return userService.batchUpdateUserReward(file);
+        } catch (Exception e) {
+            logger.error("批量奖励失败", e);
+            return RespBean.error("批量奖励失败: " + e.getMessage());
         }
     }
 
