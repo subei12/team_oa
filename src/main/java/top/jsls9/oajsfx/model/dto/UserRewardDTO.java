@@ -2,11 +2,26 @@ package top.jsls9.oajsfx.model.dto;
 
 public class UserRewardDTO {
 
+    /**
+     * 葫芦侠用户ID
+     */
     private String hlxUserId;
+    /**
+     * 昵称
+     */
     private String nickName;
+    /**
+     * 数量
+     */
     private Integer source;
+    /**
+     * 原因
+     */
     private String reason;
-    private String error; // For storing error messages per row
+    /**
+     * 错误信息
+     */
+    private String error;
 
     // Getters and Setters
 

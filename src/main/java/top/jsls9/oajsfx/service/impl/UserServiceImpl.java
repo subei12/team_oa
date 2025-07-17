@@ -320,44 +320,49 @@ public class UserServiceImpl implements UserService {
 
             // Validate data
             if (StringUtils.isBlank(reward.getHlxUserId()) || reward.getSource() == null || reward.getSource() <= 0) {
-                reward.setError("Missing or invalid data.");
+                reward.setError("数据缺失或无效.");
             } else {
                 totalSource += reward.getSource();
             }
             rewards.add(reward);
         }
 
-        // Check budget
+        // 校验预算
         User userLogin = getUserLogin();
         Dept dept = deptDao.selectByPrimaryKey(userLogin.getDeptId());
         if (dept.getSource() < totalSource) {
-            return RespBean.error("Budget is not enough.");
+            return RespBean.error("预算不足.");
         }
 
         List<String> errors = new ArrayList<>();
         for (UserRewardDTO reward : rewards) {
             if (reward.getError() != null) {
-                errors.add("Row " + (rewards.indexOf(reward) + 2) + ": " + reward.getError());
+                errors.add("用户ID: " + reward.getHlxUserId() + ", 错误: " + reward.getError());
                 continue;
             }
 
             try {
                 BudgetLog budgetLog = new BudgetLog();
-                budgetLog.setUserId(queryUserByHlxUserId(reward.getHlxUserId()).getId());
+                User user = queryUserByHlxUserId(reward.getHlxUserId());
+                if (user == null) {
+                    errors.add("用户ID: " + reward.getHlxUserId() + ", 错误: 用户不存在.");
+                    continue;
+                }
+                budgetLog.setUserId(user.getId());
                 budgetLog.setSource(reward.getSource());
                 budgetLog.setText(reward.getReason());
                 budgetLog.setCreateUserId(userLogin.getId());
                 updateUserRewardByUserId(budgetLog);
             } catch (Exception e) {
-                errors.add("Row " + (rewards.indexOf(reward) + 2) + ": " + e.getMessage());
+                errors.add("用户ID: " + reward.getHlxUserId() + ", 错误: " + e.getMessage());
             }
         }
 
         if (!errors.isEmpty()) {
-            return RespBean.error("Batch reward failed.", errors);
+            return RespBean.error("批量发放奖励失败.", errors);
         }
 
-        return RespBean.success("Batch reward successful.");
+        return RespBean.success("批量发放奖励成功.");
     }
 
     private String getStringCellValue(Cell cell) {
