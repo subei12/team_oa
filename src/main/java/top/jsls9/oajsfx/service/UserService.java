@@ -1,7 +1,9 @@
 package top.jsls9.oajsfx.service;
 
+import org.springframework.web.multipart.MultipartFile;
 import top.jsls9.oajsfx.model.BudgetLog;
 import top.jsls9.oajsfx.model.User;
+import top.jsls9.oajsfx.utils.RespBean;
 
 import java.io.IOException;
 import java.util.List;
@@ -65,4 +67,6 @@ public interface UserService {
     String withdrawal(String hlxUserId, Integer count) throws IOException;
 
     Object getUsersPosSituationtByDeptId(Integer page, Integer perPage, User user);
+
+    RespBean batchUpdateUserReward(MultipartFile file) throws Exception;
 }
