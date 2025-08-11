@@ -312,14 +312,26 @@ public class UserServiceImpl implements UserService {
                 continue;
             }
 
+            String hlxUserId = getStringCellValue(row.getCell(0));
+            if (StringUtils.isBlank(hlxUserId)) {
+                logger.info("第一列为空，解析结束");
+                break;
+            }
+
+            String nickName = getStringCellValue(row.getCell(1));
+            Integer source = getIntegerCellValue(row.getCell(2));
+            String reason = getStringCellValue(row.getCell(3));
+            logger.info("解析到第 " + i + "行，内容为：" + hlxUserId + "," + nickName + "," + source + "," + reason);
+
+
             UserRewardDTO reward = new UserRewardDTO();
-            reward.setHlxUserId(getStringCellValue(row.getCell(0)));
-            reward.setNickName(getStringCellValue(row.getCell(1)));
-            reward.setSource(getIntegerCellValue(row.getCell(2)));
-            reward.setReason(getStringCellValue(row.getCell(3)));
+            reward.setHlxUserId(hlxUserId);
+            reward.setNickName(nickName);
+            reward.setSource(source);
+            reward.setReason(reason);
 
             // Validate data
-            if (StringUtils.isBlank(reward.getHlxUserId()) || reward.getSource() == null || reward.getSource() <= 0) {
+            if (reward.getSource() == null || reward.getSource() <= 0) {
                 reward.setError("数据缺失或无效.");
             } else {
                 totalSource += reward.getSource();
