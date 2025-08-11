@@ -385,7 +385,10 @@ public class UserServiceImpl implements UserService {
         }
         switch (cell.getCellType()) {
             case STRING:
-                return Integer.parseInt(cell.getStringCellValue());
+                if(StringUtils.isNotBlank(cell.getStringCellValue())){
+                    return Integer.parseInt(cell.getStringCellValue());
+                }
+                return null;
             case NUMERIC:
                 return (int) cell.getNumericCellValue();
             default:
