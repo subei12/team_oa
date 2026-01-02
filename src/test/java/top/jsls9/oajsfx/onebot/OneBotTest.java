@@ -1,5 +1,6 @@
 package top.jsls9.oajsfx.onebot;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -12,13 +13,16 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import top.jsls9.oajsfx.controller.OneBotWebHookController;
+import top.jsls9.oajsfx.model.User;
 import top.jsls9.oajsfx.onebot.annotation.OneBotController;
 import top.jsls9.oajsfx.onebot.annotation.OneBotGroupHandler;
 import top.jsls9.oajsfx.onebot.annotation.OneBotPrivateHandler;
 import top.jsls9.oajsfx.onebot.core.OneBotDispatcher;
 import top.jsls9.oajsfx.onebot.handler.OneBotHelloHandler;
+import top.jsls9.oajsfx.onebot.handler.OneBotUserHandler;
 import top.jsls9.oajsfx.onebot.model.OneBotGroupMessageEvent;
 import top.jsls9.oajsfx.onebot.model.OneBotPrivateMessageEvent;
+import top.jsls9.oajsfx.service.UserService;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -46,6 +50,9 @@ public class OneBotTest {
     @Autowired
     private TestHandler testHandler;
 
+    @Autowired
+    private UserService userService;
+
     /**
      * 测试群消息分发
      * <p>
@@ -61,6 +68,7 @@ public class OneBotTest {
         JSONObject json = new JSONObject();
         json.put("post_type", "message");
         json.put("message_type", "group");
+        json.put("message", buildTextMessage("hello world"));
         json.put("raw_message", "hello world");
         json.put("group_id", 123456L);
         json.put("user_id", 11111L);
@@ -88,6 +96,7 @@ public class OneBotTest {
         JSONObject json = new JSONObject();
         json.put("post_type", "message");
         json.put("message_type", "private");
+        json.put("message", buildTextMessage("ping me"));
         json.put("raw_message", "ping me");
         json.put("user_id", 22222L);
 
@@ -107,6 +116,7 @@ public class OneBotTest {
         JSONObject json = new JSONObject();
         json.put("post_type", "message");
         json.put("message_type", "private");
+        json.put("message", buildTextMessage("hello there"));
         json.put("raw_message", "hello there");
         json.put("user_id", 33333L);
 
@@ -117,7 +127,114 @@ public class OneBotTest {
         Assertions.assertNotNull(result);
         Assertions.assertTrue(result instanceof JSONObject);
         JSONObject jsonResult = (JSONObject) result;
-        Assertions.assertEquals("嗨", jsonResult.getString("reply"));
+        Object reply = jsonResult.get("reply");
+        Assertions.assertNotNull(reply);
+        Assertions.assertTrue(reply.toString().contains("嗨"));
+    }
+
+    /**
+     * 测试查询用户的私聊回复
+     */
+    @Test
+    public void testUserQueryPrivateReply() throws Exception {
+        // 重置 mock
+        reset(userService);
+
+        // 准备用户数据
+        User baseUser = new User();
+        baseUser.setId("u1");
+        baseUser.setHlxUserId("2622798046");
+        baseUser.setQq("888");
+        baseUser.setDeptId("d1");
+
+        User detailUser = new User();
+        detailUser.setId("u1");
+        detailUser.setHlxUserId("2622798046");
+        detailUser.setQq("888");
+        detailUser.setDeptId("d1");
+        detailUser.setNick("测试昵称");
+        detailUser.setTitle("达人");
+        detailUser.setIntegral(10);
+        detailUser.setGourd(20);
+
+        when(userService.queryUserByHlxUserId("2622798046")).thenReturn(baseUser);
+        when(userService.queryUserById("u1")).thenReturn(detailUser);
+
+        // 模拟私聊查询
+        JSONObject json = new JSONObject();
+        json.put("post_type", "message");
+        json.put("message_type", "private");
+        json.put("message", buildTextMessage("查询用户 2622798046"));
+        json.put("raw_message", "查询用户 2622798046");
+        json.put("user_id", 55555L);
+        json.put("message_id", 101);
+
+        Object result = oneBotWebHookController.handleWebhook(json.toJSONString(), null, null);
+
+        // 验证回复内容包含关键字段
+        Assertions.assertNotNull(result);
+        Assertions.assertTrue(result instanceof JSONObject);
+        JSONObject jsonResult = (JSONObject) result;
+        Object reply = jsonResult.get("reply");
+        Assertions.assertNotNull(reply);
+        String replyText = reply.toString();
+        Assertions.assertTrue(replyText.contains("社区ID: 2622798046"));
+        Assertions.assertTrue(replyText.contains("QQ: 888"));
+        Assertions.assertTrue(replyText.contains("昵称: 测试昵称"));
+    }
+
+    /**
+     * 测试查询用户的群聊回复（包含@）
+     */
+    @Test
+    public void testUserQueryGroupReply() throws Exception {
+        // 重置 mock
+        reset(userService);
+
+        // 准备用户数据
+        User baseUser = new User();
+        baseUser.setId("u2");
+        baseUser.setHlxUserId("2622798046");
+        baseUser.setQq("999");
+        baseUser.setDeptId("d2");
+
+        when(userService.queryUserByHlxUserId("2622798046")).thenReturn(baseUser);
+        when(userService.queryUserById("u2")).thenReturn(baseUser);
+
+        // 模拟群聊查询
+        JSONObject json = new JSONObject();
+        json.put("post_type", "message");
+        json.put("message_type", "group");
+        json.put("message", buildAtTextMessage(2969001254L, "查询用户 2622798046"));
+        json.put("raw_message", "查询用户 2622798046");
+        json.put("user_id", 66666L);
+        json.put("message_id", 202);
+        json.put("group_id", 123456L);
+
+        Object result = oneBotWebHookController.handleWebhook(json.toJSONString(), null, null);
+
+        // 验证回复包含用户信息（群聊@机器人时不再重复@发送者）
+        Assertions.assertNotNull(result);
+        Assertions.assertTrue(result instanceof JSONObject);
+        JSONObject jsonResult = (JSONObject) result;
+        Object reply = jsonResult.get("reply");
+        Assertions.assertNotNull(reply);
+        String replyText = reply.toString();
+        Assertions.assertTrue(replyText.contains("社区ID: 2622798046"));
+
+        // 群聊不@机器人时也能触发
+        JSONObject jsonNoAt = new JSONObject();
+        jsonNoAt.put("post_type", "message");
+        jsonNoAt.put("message_type", "group");
+        jsonNoAt.put("message", buildTextMessage("查询用户 2622798046"));
+        jsonNoAt.put("raw_message", "查询用户 2622798046");
+        jsonNoAt.put("user_id", 66666L);
+        jsonNoAt.put("message_id", 203);
+        jsonNoAt.put("group_id", 123456L);
+
+        Object resultNoAt = oneBotWebHookController.handleWebhook(jsonNoAt.toJSONString(), null, null);
+        Assertions.assertNotNull(resultNoAt);
+        Assertions.assertTrue(resultNoAt instanceof JSONObject);
     }
     
     /**
@@ -135,7 +252,8 @@ public class OneBotTest {
         JSONObject json = new JSONObject();
         json.put("post_type", "message");
         json.put("message_type", "group");
-        json.put("raw_message", "other message"); // "other" 不在关键字列表中
+        json.put("message", buildTextMessage("other message"));
+        json.put("raw_message", "other message");
 
         oneBotWebHookController.handleWebhook(json.toJSONString(), null, null);
 
@@ -212,17 +330,70 @@ public class OneBotTest {
     }
 
     /**
+     * 构建仅包含文本的 message 数组
+     *
+     * @param text 文本内容
+     * @return message 数组
+     */
+    private JSONArray buildTextMessage(String text) {
+        JSONArray message = new JSONArray();
+        JSONObject textNode = new JSONObject();
+        textNode.put("type", "text");
+        JSONObject textData = new JSONObject();
+        textData.put("text", text);
+        textNode.put("data", textData);
+        message.add(textNode);
+        return message;
+    }
+
+    /**
+     * 构建包含@与文本的 message 数组
+     *
+     * @param atQq 被@的 QQ
+     * @param text 文本内容
+     * @return message 数组
+     */
+    private JSONArray buildAtTextMessage(Long atQq, String text) {
+        JSONArray message = new JSONArray();
+        JSONObject atNode = new JSONObject();
+        atNode.put("type", "at");
+        JSONObject atData = new JSONObject();
+        atData.put("qq", String.valueOf(atQq));
+        atNode.put("data", atData);
+        message.add(atNode);
+
+        JSONObject textNode = new JSONObject();
+        textNode.put("type", "text");
+        JSONObject textData = new JSONObject();
+        textData.put("text", text);
+        textNode.put("data", textData);
+        message.add(textNode);
+        return message;
+    }
+
+    /**
      * 测试配置类
      * <p>
      * 仅加载测试所需的 Bean，避免启动完整的 Spring Boot 上下文（含数据库连接等）。
      * </p>
      */
     @TestConfiguration
-    @Import({OneBotWebHookController.class, OneBotDispatcher.class, OneBotHelloHandler.class})
+    @Import({OneBotWebHookController.class, OneBotDispatcher.class, OneBotHelloHandler.class, OneBotUserHandler.class})
     static class Config {
+        /**
+         * 注入测试处理器
+         */
         @Bean
         public TestHandler testHandler() {
             return new TestHandler();
+        }
+
+        /**
+         * 注入 UserService 的 mock 实例
+         */
+        @Bean
+        public UserService userService() {
+            return mock(UserService.class);
         }
     }
 
@@ -254,3 +425,4 @@ public class OneBotTest {
         }
     }
 }
+

@@ -1,5 +1,7 @@
 package top.jsls9.oajsfx.onebot.core;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -143,30 +145,85 @@ public class OneBotDispatcher implements ApplicationListener<ContextRefreshedEve
          */
         boolean matches(OneBotEvent event, String globalPrefix) {
             if (event instanceof OneBotMessageEvent) {
-                String rawMessage = ((OneBotMessageEvent) event).getRawMessage();
-                if (rawMessage == null) return false;
+                OneBotMessageEvent messageEvent = (OneBotMessageEvent) event;
+                String matchText = extractMessageText(messageEvent);
+                if (!StringUtils.hasText(matchText)) return false;
                 
                 // 1. 检查全局前缀
                 if (StringUtils.hasText(globalPrefix)) {
-                    if (!rawMessage.startsWith(globalPrefix)) {
+                    if (!matchText.startsWith(globalPrefix)) {
                         return false;
                     }
-                    rawMessage = rawMessage.substring(globalPrefix.length());
+                    matchText = matchText.substring(globalPrefix.length());
                 }
                 
-                // 2. 检查关键字
+                // 2. 处理前缀@，群聊@机器人时也可匹配命令
+                matchText = stripLeadingAt(matchText);
                 if (keywords == null || keywords.length == 0) {
                     return true; // 没有关键字限制，则匹配所有（前提是已通过全局前缀检查）
                 }
 
                 for (String keyword : keywords) {
-                    if (rawMessage.startsWith(keyword)) {
+                    if (matchText.startsWith(keyword)) {
                         return true;
                     }
                 }
                 return false;
             }
             return true; // 非消息事件直接匹配类型（因为已经在 dispatch 的 map 中筛选过了）
+        }
+
+        /**
+         * 从 message 字段提取首个文本内容
+         *
+         * @param event 消息事件
+         * @return 首个文本消息（去除首尾空格）
+         */
+        private static String extractMessageText(OneBotMessageEvent event) {
+            Object message = event.getMessage();
+            if (message instanceof String) {
+                String text = ((String) message).trim();
+                return StringUtils.hasText(text) ? text : null;
+            }
+            if (message instanceof JSONArray) {
+                JSONArray nodes = (JSONArray) message;
+                for (Object node : nodes) {
+                    if (node instanceof JSONObject) {
+                        JSONObject jsonNode = (JSONObject) node;
+                        if ("text".equals(jsonNode.getString("type"))) {
+                            JSONObject data = jsonNode.getJSONObject("data");
+                            if (data != null) {
+                                String text = data.getString("text");
+                                if (StringUtils.hasText(text)) {
+                                    return text.trim();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        /**
+         * 移除消息开头的 CQ @ 代码，保证命令关键词能匹配
+         *
+         * @param message 原始消息
+         * @return 去除前缀@的消息
+         */
+        private static String stripLeadingAt(String message) {
+            if (!StringUtils.hasText(message)) {
+                return message;
+            }
+            String result = message;
+            while (result.startsWith("[CQ:at,")) {
+                int end = result.indexOf("]");
+                if (end < 0) {
+                    break;
+                }
+                result = result.substring(end + 1).trim();
+            }
+            return result;
         }
     }
 }
