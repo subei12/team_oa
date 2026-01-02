@@ -103,8 +103,17 @@ public class OneBotDispatcher implements ApplicationListener<ContextRefreshedEve
             if (handler.matches(event, globalPrefix)) {
                 try {
                     return handler.method.invoke(handler.bean, event);
+                } catch (java.lang.reflect.InvocationTargetException ite) {
+                    // 解包反射异常，获取真实的业务异常
+                    logger.error("Error executing OneBot handler: {}.{}", 
+                            handler.bean.getClass().getSimpleName(), 
+                            handler.method.getName(), 
+                            ite.getTargetException());
                 } catch (Exception e) {
-                    logger.error("Error invoking OneBot handler", e);
+                    logger.error("Error invoking OneBot handler: {}.{}", 
+                            handler.bean.getClass().getSimpleName(), 
+                            handler.method.getName(), 
+                            e);
                 }
             }
         }
