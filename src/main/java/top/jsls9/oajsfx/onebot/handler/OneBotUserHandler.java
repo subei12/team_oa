@@ -608,7 +608,11 @@ public class OneBotUserHandler {
         if (atUser) {
             builder.at(event.getUserId());
         }
-        builder.text(text);
+        String replyText = text;
+        if (atUser && event instanceof OneBotGroupMessageEvent) {
+            replyText = "\n" + (text == null ? "" : text);
+        }
+        builder.text(replyText);
         return builder.build();
     }
 
