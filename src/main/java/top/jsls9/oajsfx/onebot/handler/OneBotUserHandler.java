@@ -180,15 +180,6 @@ public class OneBotUserHandler {
      */
     private JSONObject buildUserQueryReply(OneBotMessageEvent event, boolean atUser) {
         String messageText = extractMessageText(event);
-        if (StringUtils.isNotBlank(messageText)) {
-            int index = messageText.indexOf(QUERY_USER_KEYWORD);
-            if (index >= 0) {
-                String rest = messageText.substring(index + QUERY_USER_KEYWORD.length()).trim();
-                if (rest.startsWith("列表")) {
-                    return buildUserListReply(event, atUser);
-                }
-            }
-        }
         // 解析用户标识（支持“查询用户 123”或“查询用户123”）
         String query = extractQueryId(messageText);
         if (StringUtils.isBlank(query)) {

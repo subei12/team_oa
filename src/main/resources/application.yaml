@@ -1,4 +1,3 @@
-
 spring:
   datasource:
     username: team_oa
@@ -70,7 +69,10 @@ logging:
     root: error
   file:
     path: logs
-
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+  charset:
+    console: UTF-8
 
 server:
   servlet:
@@ -118,3 +120,7 @@ qq:
   number: 3078449526
   report:
     group: 279335049
+
+onebot:
+  global-prefix: "" # Global prefix for command handling (e.g., "/", "#")
+  secret: "5%.i]ZE+Q>4<4A+X" # Secret for HMAC SHA1 signature verification. Leave empty to disable.

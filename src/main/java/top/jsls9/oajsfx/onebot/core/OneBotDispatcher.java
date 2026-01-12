@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
@@ -15,6 +16,8 @@ import top.jsls9.oajsfx.onebot.model.OneBotEvent;
 import top.jsls9.oajsfx.onebot.model.OneBotGroupMessageEvent;
 import top.jsls9.oajsfx.onebot.model.OneBotMessageEvent;
 import top.jsls9.oajsfx.onebot.model.OneBotPrivateMessageEvent;
+import top.jsls9.oajsfx.onebot.service.OneBotPermissionChecker;
+import top.jsls9.oajsfx.onebot.utils.OneBotReplyBuilder;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -35,6 +38,9 @@ public class OneBotDispatcher implements ApplicationListener<ContextRefreshedEve
 
     @Value("${onebot.global-prefix:}")
     private String globalPrefix;
+
+    @Autowired
+    private OneBotPermissionChecker permissionChecker;
 
     private final Map<String, List<HandlerMethod>> handlers = new HashMap<>();
 
@@ -103,6 +109,13 @@ public class OneBotDispatcher implements ApplicationListener<ContextRefreshedEve
 
         for (HandlerMethod handler : methods) {
             if (handler.matches(event, globalPrefix)) {
+                if (permissionChecker != null && event instanceof OneBotMessageEvent) {
+                    OneBotMessageEvent messageEvent = (OneBotMessageEvent) event;
+                    String permissionDenied = permissionChecker.checkCommandPermissionByKeywords(messageEvent, handler.keywords);
+                    if (permissionDenied != null) {
+                        return buildPermissionDeniedReply(messageEvent, permissionDenied);
+                    }
+                }
                 try {
                     return handler.method.invoke(handler.bean, event);
                 } catch (java.lang.reflect.InvocationTargetException ite) {
@@ -120,6 +133,29 @@ public class OneBotDispatcher implements ApplicationListener<ContextRefreshedEve
             }
         }
         return null;
+    }
+
+    /**
+     * 构建无权限回复
+     *
+     * @param event   消息事件
+     * @param message 回复文本
+     * @return 回复 JSON
+     */
+    private JSONObject buildPermissionDeniedReply(OneBotMessageEvent event, String message) {
+        if (event == null || !StringUtils.hasText(message)) {
+            return null;
+        }
+        OneBotReplyBuilder builder = OneBotReplyBuilder.create();
+        boolean isGroup = event instanceof OneBotGroupMessageEvent;
+        if (!isGroup) {
+            builder.replyTo(event.getMessageId());
+        } else {
+            builder.at(event.getUserId());
+            message = "\n" + message;
+        }
+        builder.text(message);
+        return builder.build();
     }
 
     /**
