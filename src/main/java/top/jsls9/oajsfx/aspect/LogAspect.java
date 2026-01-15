@@ -38,7 +38,7 @@ public class LogAspect {
     /**
      * 定义切面
      */
-    @Pointcut("execution(* top.jsls9.oajsfx.controller.*..*(..)) && !execution(* top.jsls9.oajsfx.controller.QqMsgWebHookController..*(..))")
+    @Pointcut("execution(* top.jsls9.oajsfx.controller.*..*(..)) && !execution(* top.jsls9.oajsfx.controller.QqMsgWebHookController..*(..)) && !execution(* top.jsls9.oajsfx.controller.OneBotWebHookController..*(..))")
     public void log() {
     }
 
@@ -116,20 +116,28 @@ public class LogAspect {
              * 改了之后哦参数不为空了，太打了，30w，玩尼玛
              */
             params = JSON.toJSONString(args, SerializerFeature.IgnoreErrorGetter);
-            if(params.length()>=10000){//数据库能放2w，我觉得没有必要，1w意思一下算了，反正是图片都会走这里
-
-                JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(args[0], SerializerFeature.IgnoreErrorGetter));
-
-                String contentType = jsonObject.getString("contentType");
-                String size = jsonObject.getString("size");
-                String str="{\n" +
-                        "\t\"contentType\": \""+contentType+"\",\n" +
-                        "\t\"size\": "+size+",\n" +
-                        "\t\"uplodeDate\": \""+new Date()+"\"\n" +
-                        "}";
-
-                params=str;
-
+            if (params != null && params.length() >= 10000) {
+                try {
+                    // 尝试作为文件上传对象处理（保留原作者意图）
+                    JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(args[0], SerializerFeature.IgnoreErrorGetter));
+                    String contentType = jsonObject.getString("contentType");
+                    String size = jsonObject.getString("size");
+                    
+                    if (contentType != null && size != null) {
+                        String str = "{\n" +
+                                "\t\"contentType\": \"" + contentType + "\",\n" +
+                                "\t\"size\": " + size + ",\n" +
+                                "\t\"uplodeDate\": \"" + new Date() + "\"\n" +
+                                "}";
+                        params = str;
+                    } else {
+                        // 虽然是JSON对象但没有文件信息，直接截断
+                        params = params.substring(0, 10000) + "...(content too long)";
+                    }
+                } catch (Exception e) {
+                    // 解析失败（说明 args[0] 不是对象，或者不是期望的文件对象），直接截断
+                    params = params.substring(0, 10000) + "...(content too long)";
+                }
             }
 
 

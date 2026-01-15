@@ -27,6 +27,7 @@ import java.util.Map;
 public class PermissionController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final int TYPE_COMMAND = 3;
 
     @Autowired
     private PermissionService permissionService;
@@ -77,6 +78,10 @@ public class PermissionController {
             if(id != p.getId()){
                 return RespBean.error("修改失败，参数不一致。");
             }
+            RespBean validation = validateCommandPermission(p);
+            if (validation != null) {
+                return validation;
+            }
             permissionService.updateById(p);
             return RespBean.success("修改成功");
         }catch (Exception e){
@@ -99,6 +104,10 @@ public class PermissionController {
     @ApiOperation("新增")
     @PostMapping("/permission")
     public RespBean addPermission(@RequestBody Permission p){
+        RespBean validation = validateCommandPermission(p);
+        if (validation != null) {
+            return validation;
+        }
         int i = permissionService.addPermission(p);
         if(i == 1){
             return RespBean.success("新增成功");
@@ -148,6 +157,24 @@ public class PermissionController {
         }
     }
 
+    /**
+     * 校验指令类型权限配置
+     *
+     * @param permission 权限配置
+     * @return 校验结果（为 null 表示通过）
+     */
+    private RespBean validateCommandPermission(Permission permission) {
+        if (permission == null) {
+            return RespBean.error("参数缺失");
+        }
+        if (permission.getType() != null && permission.getType() == TYPE_COMMAND) {
+            if (StringUtils.isBlank(permission.getUrl())) {
+                return RespBean.error("指令不能为空");
+            }
+            permission.setUrl(permission.getUrl().trim());
+        }
+        return null;
+    }
 
 
 
