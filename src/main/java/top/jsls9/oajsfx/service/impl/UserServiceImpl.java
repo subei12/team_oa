@@ -9,10 +9,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,16 +24,21 @@ import top.jsls9.oajsfx.model.*;
 import top.jsls9.oajsfx.model.dto.UserRewardDTO;
 import top.jsls9.oajsfx.service.UserService;
 import top.jsls9.oajsfx.utils.HlxUtils;
+import top.jsls9.oajsfx.utils.MailUtils;
 import top.jsls9.oajsfx.utils.RedisUtil;
 import top.jsls9.oajsfx.utils.RespBean;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Date;
 
 /**
  * @author bSu
@@ -65,6 +72,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private RedisUtil redisUtil;
+
+    @Autowired
+    private MailUtils mailUtils;
 
     @Override
     public Map<String, Object> queryUsersByPageAndUser(Integer pageNum, Integer pageSize, User user) {
@@ -299,45 +309,99 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public RespBean batchUpdateUserReward(MultipartFile file) throws Exception {
-        InputStream inputStream = file.getInputStream();
-        Workbook workbook = new XSSFWorkbook(inputStream);
-        Sheet sheet = workbook.getSheetAt(0);
+        User userLogin = getUserLogin();
+        String fileName = file == null ? null : file.getOriginalFilename();
+        if (file == null || file.isEmpty()) {
+            sendBatchRewardFailMail(userLogin, null, fileName, "文件不能为空.", null);
+            return RespBean.error("文件不能为空.");
+        }
 
         List<UserRewardDTO> rewards = new ArrayList<>();
         int totalSource = 0;
 
-        for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-            Row row = sheet.getRow(i);
-            if (row == null) {
-                continue;
-            }
+        try (InputStream inputStream = file.getInputStream();
+             Workbook workbook = WorkbookFactory.create(inputStream)) {
 
-            UserRewardDTO reward = new UserRewardDTO();
-            reward.setHlxUserId(getStringCellValue(row.getCell(0)));
-            reward.setNickName(getStringCellValue(row.getCell(1)));
-            reward.setSource(getIntegerCellValue(row.getCell(2)));
-            reward.setReason(getStringCellValue(row.getCell(3)));
-
-            // Validate data
-            if (StringUtils.isBlank(reward.getHlxUserId()) || reward.getSource() == null || reward.getSource() <= 0) {
-                reward.setError("数据缺失或无效.");
-            } else {
-                totalSource += reward.getSource();
+            if (workbook.getNumberOfSheets() <= 0) {
+                sendBatchRewardFailMail(userLogin, null, fileName, "Excel为空或无工作表.", null);
+                return RespBean.error("Excel为空或无工作表.");
             }
-            rewards.add(reward);
+            Sheet sheet = workbook.getSheetAt(0);
+            DataFormatter formatter = new DataFormatter();
+            FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+
+            for (Row row : sheet) {
+                if (row == null || row.getRowNum() == 0) {
+                    continue;
+                }
+                if (isRowEmpty(row, formatter, evaluator)) {
+                    continue;
+                }
+
+                int excelRowNum = row.getRowNum() + 1;
+                UserRewardDTO reward = new UserRewardDTO();
+                String hlxUserIdRaw = getCellText(row.getCell(0), formatter, evaluator);
+                String sourceRaw = getCellText(row.getCell(2), formatter, evaluator);
+                String reasonRaw = getCellText(row.getCell(3), formatter, evaluator);
+
+                reward.setHlxUserId(normalizeIntegerString(hlxUserIdRaw));
+                reward.setNickName(getCellText(row.getCell(1), formatter, evaluator));
+                reward.setSource(parseInteger(sourceRaw));
+                reward.setReason(reasonRaw);
+
+                List<String> rowErrors = new ArrayList<>();
+                if (StringUtils.isBlank(hlxUserIdRaw)) {
+                    rowErrors.add("葫芦侠用户ID不能为空");
+                } else if (StringUtils.isBlank(reward.getHlxUserId())) {
+                    rowErrors.add("葫芦侠用户ID格式错误");
+                }
+
+                if (StringUtils.isBlank(sourceRaw)) {
+                    rowErrors.add("奖励数量不能为空");
+                } else if (reward.getSource() == null || reward.getSource() <= 0) {
+                    rowErrors.add("奖励数量需要为正整数");
+                }
+
+                if (StringUtils.isBlank(reasonRaw)) {
+                    rowErrors.add("奖励原因不能为空");
+                }
+
+                if (!rowErrors.isEmpty()) {
+                    reward.setError("第" + excelRowNum + "行: " + String.join("；", rowErrors));
+                } else {
+                    totalSource += reward.getSource();
+                }
+
+                rewards.add(reward);
+            }
+        } catch (Exception e) {
+            logger.error("读取Excel失败", e);
+            sendBatchRewardFailMail(userLogin, null, fileName, "读取Excel失败: " + e.getMessage(), null);
+            return RespBean.error("读取Excel失败: " + e.getMessage());
+        }
+
+        if (rewards.isEmpty()) {
+            sendBatchRewardFailMail(userLogin, null, fileName, "Excel中未读取到有效数据.", null);
+            return RespBean.error("Excel中未读取到有效数据.");
         }
 
         // 校验预算
-        User userLogin = getUserLogin();
         Dept dept = deptDao.selectByPrimaryKey(userLogin.getDeptId());
+        if (dept == null) {
+            sendBatchRewardFailMail(userLogin, null, fileName, "团队信息异常，deptId=" + userLogin.getDeptId(), null);
+            return RespBean.error("团队信息异常，请联系管理员。");
+        }
         if (dept.getSource() < totalSource) {
+            sendBatchRewardFailMail(userLogin, dept, fileName,
+                    "预算不足. 需要:" + totalSource + "，剩余:" + dept.getSource(),
+                    null);
             return RespBean.error("预算不足.");
         }
 
         List<String> errors = new ArrayList<>();
         for (UserRewardDTO reward : rewards) {
             if (reward.getError() != null) {
-                errors.add("用户ID: " + reward.getHlxUserId() + ", 错误: " + reward.getError());
+                errors.add(reward.getError());
                 continue;
             }
 
@@ -359,40 +423,149 @@ public class UserServiceImpl implements UserService {
         }
 
         if (!errors.isEmpty()) {
-            return RespBean.error("批量发放奖励失败.", errors);
+            sendBatchRewardFailMail(userLogin, dept, fileName, "批量发放奖励失败.", errors);
+            return RespBean.error("批量发放奖励失败，错误详情已发送到邮箱，请查收。");
         }
 
         return RespBean.success("批量发放奖励成功.");
     }
 
-    private String getStringCellValue(Cell cell) {
-        if (cell == null) {
-            return null;
-        }
-        switch (cell.getCellType()) {
-            case STRING:
-                return cell.getStringCellValue();
-            case NUMERIC:
-                return String.valueOf((long) cell.getNumericCellValue());
-            default:
-                return null;
+    private void sendBatchRewardFailMail(User operator, Dept dept, String fileName, String reason, List<String> errors) {
+        try {
+            String to = getUserEmail(operator);
+            if (StringUtils.isBlank(to)) {
+                logger.warn("批量奖励失败邮件未发送：无法解析操作人邮箱，operator={}", operator == null ? null : operator.getUsername());
+                return;
+            }
+
+            String[] cc = getSuperAdminEmails(to);
+            String deptName = dept == null ? operator == null ? null : operator.getDeptId() : dept.getName();
+
+            String subject = "【OA】批量发放奖励失败 - " + (operator == null ? "" : operator.getUsername());
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            StringBuilder content = new StringBuilder();
+            content.append("OA批量发放奖励失败").append("\n\n")
+                    .append("时间: ").append(sdf.format(new Date())).append("\n")
+                    .append("操作人: ").append(operator == null ? "" : operator.getUsername()).append("\n")
+                    .append("团队: ").append(StringUtils.isBlank(deptName) ? "" : deptName).append("\n");
+            if (StringUtils.isNotBlank(fileName)) {
+                content.append("文件: ").append(fileName).append("\n");
+            }
+            content.append("原因: ").append(reason).append("\n");
+
+            if (errors != null && !errors.isEmpty()) {
+                content.append("\n错误详情:\n");
+                for (String err : errors) {
+                    if (StringUtils.isBlank(err)) {
+                        continue;
+                    }
+                    content.append("- ").append(err).append("\n");
+                }
+            }
+
+            mailUtils.sendTextMail(to, cc, subject, content.toString());
+        } catch (Exception e) {
+            logger.error("批量奖励失败邮件发送异常", e);
         }
     }
 
-    private Integer getIntegerCellValue(Cell cell) {
+    private String[] getSuperAdminEmails(String operatorEmail) {
+        List<User> users = userDao.getUsersByRoleName("superAdmin");
+        if (users == null || users.isEmpty()) {
+            return null;
+        }
+        Set<String> emails = new LinkedHashSet<>();
+        for (User user : users) {
+            String email = getUserEmail(user);
+            if (StringUtils.isBlank(email)) {
+                continue;
+            }
+            if (StringUtils.isNotBlank(operatorEmail) && operatorEmail.equalsIgnoreCase(email)) {
+                continue;
+            }
+            emails.add(email);
+        }
+        if (emails.isEmpty()) {
+            return null;
+        }
+        return emails.toArray(new String[0]);
+    }
+
+    private String getUserEmail(User user) {
+        if (user == null) {
+            return null;
+        }
+        String email = buildQqEmail(user.getUsername());
+        if (StringUtils.isNotBlank(email)) {
+            return email;
+        }
+        return buildQqEmail(user.getQq());
+    }
+
+    private String buildQqEmail(String qq) {
+        if (StringUtils.isBlank(qq)) {
+            return null;
+        }
+        String trimmed = qq.trim();
+        if (!trimmed.matches("^\\d+$")) {
+            return null;
+        }
+        return trimmed + "@qq.com";
+    }
+
+    private boolean isRowEmpty(Row row, DataFormatter formatter, FormulaEvaluator evaluator) {
+        if (row == null) {
+            return true;
+        }
+        for (int i = 0; i <= 3; i++) {
+            String value = getCellText(row.getCell(i), formatter, evaluator);
+            if (StringUtils.isNotBlank(value)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private String getCellText(Cell cell, DataFormatter formatter, FormulaEvaluator evaluator) {
         if (cell == null) {
             return null;
         }
-        switch (cell.getCellType()) {
-            case STRING:
-                if(StringUtils.isNotBlank(cell.getStringCellValue())){
-                    return Integer.parseInt(cell.getStringCellValue());
-                }
-                return null;
-            case NUMERIC:
-                return (int) cell.getNumericCellValue();
-            default:
-                return null;
+        String value = formatter.formatCellValue(cell, evaluator);
+        if (StringUtils.isBlank(value)) {
+            return null;
         }
+        return value.trim();
+    }
+
+    private String normalizeIntegerString(String value) {
+        if (StringUtils.isBlank(value)) {
+            return null;
+        }
+        String trimmed = value.trim();
+        if (trimmed.matches("^\\d+$")) {
+            return trimmed;
+        }
+        if (trimmed.matches("^\\d+\\.0+$")) {
+            return trimmed.substring(0, trimmed.indexOf('.'));
+        }
+        return null;
+    }
+
+    private Integer parseInteger(String value) {
+        if (StringUtils.isBlank(value)) {
+            return null;
+        }
+        String trimmed = value.trim();
+        try {
+            if (trimmed.matches("^[+-]?\\d+$")) {
+                return Integer.valueOf(trimmed);
+            }
+            if (trimmed.matches("^[+-]?\\d+\\.0+$")) {
+                return Integer.valueOf(trimmed.substring(0, trimmed.indexOf('.')));
+            }
+        } catch (Exception ignored) {
+            return null;
+        }
+        return null;
     }
 }

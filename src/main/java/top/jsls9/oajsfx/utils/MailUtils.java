@@ -56,6 +56,32 @@ public class MailUtils {
     }
 
     /**
+     * 发送纯文本邮件(支持抄送)
+     * @param to 收件人
+     * @param cc 抄送，允许为空
+     * @param subject 标题
+     * @param content 内容
+     */
+    @Async
+    public void sendTextMail(String to, String[] cc, String subject, String content){
+        MimeMessage message = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(from);
+            helper.setTo(to);
+            if (cc != null && cc.length > 0) {
+                helper.setCc(cc);
+            }
+            helper.setSubject(subject);
+            helper.setText(content, false);
+            javaMailSender.send(message);
+            logger.info("纯文本邮件已经发送。");
+        } catch (Exception e) {
+            logger.error("发送纯文本邮件时发生异常！", e);
+        }
+    }
+
+    /**
      * 发送html格式的邮件
      * @param to 收件人
      * @param subject 标题
@@ -67,7 +93,7 @@ public class MailUtils {
 
         try {
             //true表示需要创建一个multipart message
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setFrom(from);
             helper.setTo(to);
             helper.setSubject(subject);
@@ -93,7 +119,7 @@ public class MailUtils {
 
         try {
             //true表示需要创建一个multipart message
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setFrom(from);
             helper.setTo(to);
             helper.setSubject(subject);
@@ -124,7 +150,7 @@ public class MailUtils {
 
         try {
             //true表示需要创建一个multipart message
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setFrom(from);
             helper.setTo(to);
             helper.setSubject(subject);

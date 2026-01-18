@@ -47,4 +47,11 @@ public interface UserDao {
     void updateIntegralByHlxUserId(User user);
 
     void updateGourdByHlxUserId(User user);
+
+    /**
+     * 根据角色名称查询用户列表（用于邮件通知等）
+     * @param roleName 角色名，如 superAdmin
+     * @return 用户列表
+     */
+    List<User> getUsersByRoleName(@Param("roleName") String roleName);
 }
